@@ -1,0 +1,52 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/modelsim_project/lab1
+vvending_machine
+Z0 !s110 1569444618
+!i10b 1
+!s100 <1VTkiOG9aX@YlhTYolkS0
+IPJCjJHm1C]Y<H:c0Xbh9?0
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+Z2 dC:/modelsim_project/lab2
+w1569444615
+8C:/modelsim_project/lab2/vending_machine.v
+FC:/modelsim_project/lab2/vending_machine.v
+L0 3
+Z3 OP;L;10.4a;61
+r1
+!s85 0
+31
+Z4 !s108 1569444618.000000
+!s107 vending_machine_def.v|C:/modelsim_project/lab2/vending_machine.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/modelsim_project/lab2/vending_machine.v|
+!s101 -O0
+!i113 1
+Z5 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
+vvending_machine_tb
+R0
+!i10b 1
+!s100 P_>YR>8U=1gI2:I>cOBi_3
+I?[KHLQC]>F5PClK^C6he>0
+R1
+R2
+w1569239086
+8C:/modelsim_project/lab2/vending_meachine_TB.v
+FC:/modelsim_project/lab2/vending_meachine_TB.v
+L0 6
+R3
+r1
+!s85 0
+31
+R4
+!s107 vending_machine_def.v|vending_machine.v|C:/modelsim_project/lab2/vending_meachine_TB.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/modelsim_project/lab2/vending_meachine_TB.v|
+!s101 -O0
+!i113 1
+R5

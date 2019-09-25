@@ -1,0 +1,15 @@
+C:/modelsim_project/lab2/vending_machine_def.v {1 {vlog -work work -stats=none C:/modelsim_project/lab2/vending_machine_def.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+
+} {} {}} C:/modelsim_project/lab2/vending_meachine_TB.v {2 {vlog -work work -stats=none C:/modelsim_project/lab2/vending_meachine_TB.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module vending_machine
+** Warning: ** while parsing file included at C:/modelsim_project/lab2/vending_meachine_TB.v(4)
+** at vending_machine.v(142): (vlog-2182) 'current_total' might be read before written in always_comb or always @* block.
+
+-- Compiling module vending_machine_tb
+
+Top level modules:
+	vending_machine_tb
+
+} {} {}}
