@@ -89,8 +89,10 @@ module vending_machine (
 	assign wire_output_item = o_output_item;
 	wire [`kNumCoins-1:0] wire_return_coin;
 	assign wire_return_coin = o_return_coin;
+	reg reg_trigger_return;
 	
 	initial begin
+		reg_trigger_return = 0;
 		stopwatch = 4'b1111;
 		current_total = 0;
 		current_total_nxt = 0;
@@ -122,12 +124,12 @@ module vending_machine (
 		current_total_nxt = 0;
 		for (i=0; i<`kNumCoins; i=i+1)
 			current_total_nxt = current_total_nxt + i_input_coin[i] * kkCoinValue[i] - o_return_coin[i] * kkCoinValue[i];
-		$display("o_return_coin %d", current_total_nxt);
+		//$display("o_return_coin %d", current_total_nxt);
 		for (i=0; i<`kNumItems; i=i+1)
 			current_total_nxt = current_total_nxt - o_output_item[i] * kkItemPrice[i];
 		current_total_nxt = current_total_nxt + current_total;
 	
-		$display("current_total_nxt: %d", current_total_nxt);		
+		//$display("current_total_nxt: %d", current_total_nxt);		
 	end
 
 
@@ -151,26 +153,7 @@ module vending_machine (
 		//$display("o_available_item %b", o_available_item);
 		//$display("i_select_item %b", i_select_item);
 		//$display("o_output_item %b", o_output_item);
-		output_total = current_total;
- 
-		if (i_trigger_return == 1'b1 | stopwatch == 0) begin
-			o_output_item = 0;
-			return_total_0 = output_total/kkCoinValue[2];
-			for(i=0; i<return_total_0; i=i+1) begin
-				output_total = output_total - kkCoinValue[2];		
-				//$display("kkcoinvalue2: %d", output_total);
-				o_return_coin = 4'b100;
-			end
-			return_total_0 = output_total/kkCoinValue[1];
-			for(i=0; i<return_total_0; i=i+1) begin
-				output_total = output_total - kkCoinValue[1];
-				o_return_coin = 4'b010;
-			end
-			for(i=0; i<output_total; i=i+1)
-				o_return_coin = 4'b001;
-			
-			$display("current_total %d", current_total);
-		end
+
 	end
 
 	// Sequential circuit to reset or update the states
@@ -202,14 +185,40 @@ module vending_machine (
 /////////////////////////////////////////////////////////////////////////
 
 			// decrease stopwatch
-			if (!i_input_coin & !i_select_item & !i_trigger_return) stopwatch = stopwatch - 1;
+			if (!i_input_coin & !i_select_item) stopwatch = stopwatch - 1;
 			else stopwatch = 4'b1111;
-			if (i_input_coin) o_return_coin = 0;
-
-
+		
 			//if you have to return some coins then you have to turn on the bit
 			
-			
+			output_total = current_total_nxt;
+			if (i_trigger_return == 1'b1) reg_trigger_return = i_trigger_return;
+			//if you have to return some coins then you have to turn on the bit
+			if (reg_trigger_return == 1'b1 | stopwatch == 0) begin
+				o_output_item = 0;
+				return_total_2 = output_total/kkCoinValue[2];
+				return_total_1 = output_total/kkCoinValue[1];
+				return_total_0 = output_total/kkCoinValue[0];
+				if (return_total_2 > 0) begin
+					o_return_coin = 3'b100;
+					output_total = output_total - kkCoinValue[2];
+				end
+				else if (return_total_1 > 0) begin
+					o_return_coin = 3'b010;
+					output_total = output_total - kkCoinValue[1];
+				end
+				else if (return_total_0 > 0) begin
+					o_return_coin = 3'b001;
+					output_total = output_total - kkCoinValue[0];
+				end
+				else begin
+					reg_trigger_return = 0;
+					o_return_coin = 3'b000;
+					current_total = 0;
+					current_total_nxt = 0;
+					output_total = 0;
+				end
+				$display("bottom return coin %d", o_return_coin);
+			end
 /////////////////////////////////////////////////////////////////////////
 		end		   //update all state end
 	end	   //always end
