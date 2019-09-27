@@ -90,6 +90,7 @@ module vending_machine (
 	wire [`kNumCoins-1:0] wire_return_coin;
 	assign wire_return_coin = o_return_coin;
 	reg reg_trigger_return;
+	reg [3:0] reg_stopwatch;
 	
 	initial begin
 		reg_trigger_return = 0;
@@ -99,6 +100,7 @@ module vending_machine (
 		output_total = 0;
 		o_return_coin = 0;
 		o_output_item = 0;
+		reg_stopwatch = 0;
 		for (i=0; i<`kNumCoins; i=i+1) begin
 			num_coins[i] = 8'b00000000;
 			num_coins_nxt[i] = 8'b00000000;
@@ -107,7 +109,6 @@ module vending_machine (
 			num_items[i] = 8'b00000000;
 			num_items_nxt[i] = 8'b00000000;
 		end
-		//$display("%b", current_total);
 	end
  
 	// Combinational logic for the next states
@@ -128,8 +129,10 @@ module vending_machine (
 		for (i=0; i<`kNumItems; i=i+1)
 			current_total_nxt = current_total_nxt - o_output_item[i] * kkItemPrice[i];
 		current_total_nxt = current_total_nxt + current_total;
-	
-		//$display("current_total_nxt: %d", current_total_nxt);		
+		if (i_trigger_return == 1'b1) reg_trigger_return = i_trigger_return;
+		if (reg_stopwatch == 0) reg_stopwatch = stopwatch;
+		
+		$display("UP current_total_nxt: %d", current_total_nxt);		
 	end
 
 
@@ -160,44 +163,44 @@ module vending_machine (
 	always @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
 			// TODO: reset all states.
-			current_total <= 0; 
-			current_total_nxt <= 0;
-			o_output_item <= 0;
-			o_return_coin <= 0;
-			stopwatch <= 4'b1111;
+			current_total = 0; 
+			current_total_nxt = 0;
+			o_output_item = 0;
+			o_return_coin = 0;
+			stopwatch = 4'b1111;
 			for (i=0; i<`kNumCoins; i=i+1)
-				num_coins[i]<=8'b00000000;
+				num_coins[i]=8'b00000000;
 			for (i=0; i<`kNumItems; i=i+1)
-				num_items[i]<=8'b00001010;
+				num_items[i]=8'b00001010;
 			for (i=0; i<`kNumCoins; i=i+1)
-				num_coins_nxt[i]<=8'b00000000;
+				num_coins_nxt[i]=8'b00000000;
 			for (i=0; i<`kNumItems; i=i+1)
-				num_items_nxt[i]<=8'b00001010;
+				num_items_nxt[i]=8'b00001010;
 		end
 		else begin
 			// TODO: update all states.
 			for (i=0; i<`kNumItems; i=i+1)
-				num_items[i] <= num_items_nxt[i];
+				num_items[i] = num_items_nxt[i];
 			for (i=0; i<`kNumCoins; i=i+1)
-				num_coins[i] <= num_coins_nxt[i];
+				num_coins[i] = num_coins_nxt[i];
 			//$display("%b", current_total);
-			current_total <= current_total_nxt;
+			current_total = current_total_nxt;
 /////////////////////////////////////////////////////////////////////////
 
 			// decrease stopwatch
-			if (!i_input_coin & !i_select_item) stopwatch = stopwatch - 1;
+			if (!i_input_coin & !i_select_item & !reg_trigger_return) stopwatch = stopwatch - 1;
 			else stopwatch = 4'b1111;
-		
-			//if you have to return some coins then you have to turn on the bit
 			
-			output_total = current_total_nxt;
-			if (i_trigger_return == 1'b1) reg_trigger_return = i_trigger_return;
 			//if you have to return some coins then you have to turn on the bit
-			if (reg_trigger_return == 1'b1 | stopwatch == 0) begin
+			if (reg_trigger_return == 1'b1 | reg_stopwatch == 0) begin
+				if (reg_stopwatch == 0) $display ("stopwatch!");
+				if (reg_trigger_return == 1'b1) $display("trigger!!");
 				o_output_item = 0;
+				output_total = current_total;
 				return_total_2 = output_total/kkCoinValue[2];
 				return_total_1 = output_total/kkCoinValue[1];
 				return_total_0 = output_total/kkCoinValue[0];
+				$display("output_total %d",output_total);
 				if (return_total_2 > 0) begin
 					o_return_coin = 3'b100;
 					output_total = output_total - kkCoinValue[2];
@@ -212,12 +215,15 @@ module vending_machine (
 				end
 				else begin
 					reg_trigger_return = 0;
+					reg_stopwatch = 4b'1111;
 					o_return_coin = 3'b000;
 					current_total = 0;
 					current_total_nxt = 0;
 					output_total = 0;
 				end
-				$display("bottom return coin %d", o_return_coin);
+				$display("current_Total_nxt %d", current_total_nxt);
+				$display("current total %d", current_total);
+				$display("bottom return coin %b", o_return_coin);
 			end
 /////////////////////////////////////////////////////////////////////////
 		end		   //update all state end
