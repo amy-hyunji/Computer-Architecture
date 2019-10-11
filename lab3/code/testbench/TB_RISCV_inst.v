@@ -65,7 +65,7 @@ module TB_RISCV ();
 
 	//I-Memory
 	SP_SRAM #(
-		.ROMDATA ("C:\\Users\\jjeong\\lab_test\\11\\forloop.hex"), //Initialize I-Memory
+		.ROMDATA ("/Users/junahyung/csprojects/Computer_Architecture/lab3/code/testcase/hex/inst.hex"), //Initialize I-Memory
 		.AWIDTH  (10),
 		.SIZE    (1024)
 	) i_mem1 (
@@ -129,25 +129,25 @@ module TB_RISCV ();
 		TestID[2] <= "3";		TestNumInst[2] <= 16'h0003;		TestAns[2] <= 16'h0005;		TestPassed[2] <= 1'b0; //addi
 		TestID[3] <= "4";		TestNumInst[3] <= 16'h0004;		TestAns[3] <= 16'h0000;		TestPassed[3] <= 1'b0; //slti
 		TestID[4] <= "5";		TestNumInst[4] <= 16'h0005;		TestAns[4] <= 16'h0001;		TestPassed[4] <= 1'b0; //slti
-		TestID[4] <= "5";		TestNumInst[4] <= 16'h0006;		TestAns[4] <= 16'h0000;		TestPassed[4] <= 1'b0; //slti
-		TestID[5] <= "6";		TestNumInst[5] <= 16'h0007;		TestAns[5] <= 16'h0001;		TestPassed[5] <= 1'b0; //sltiu
-		TestID[6] <= "7";		TestNumInst[6] <= 16'h0008;		TestAns[6] <= 16'h0005;		TestPassed[6] <= 1'b0; //xori
-		TestID[7] <= "8";		TestNumInst[7] <= 16'h0009;		TestAns[7] <= 16'h0005;		TestPassed[7] <= 1'b0; //andi
-		TestID[8] <= "9";		TestNumInst[8] <= 16'h000a;		TestAns[8] <= 16'h000f;		TestPassed[8] <= 1'b0; //ori
-		TestID[9] <= "10";		TestNumInst[9] <= 16'h00b;		TestAns[9] <= 16'h001e;		TestPassed[9] <= 1'b0; //slli
-		TestID[10] <= "11";		TestNumInst[10] <= 16'h00c;	TestAns[10] <= 16'h000f;	TestPassed[10] <= 1'b0; //srli
-		TestID[11] <= "12";		TestNumInst[11] <= 16'h00d;	TestAns[11] <= 16'h0002;	TestPassed[11] <= 1'b0; //srai
-		TestID[12] <= "13";		TestNumInst[12] <= 16'h00e;	TestAns[12] <= 16'h0007;	TestPassed[12] <= 1'b0; //add
-		TestID[13] <= "14";		TestNumInst[13] <= 16'h00f;	TestAns[13] <= 16'h0002;	TestPassed[13] <= 1'b0; //sub
-		TestID[14] <= "15";		TestNumInst[14] <= 16'h0010;	TestAns[14] <= 16'h0014;	TestPassed[14] <= 1'b0; //sll
-		TestID[15] <= "16";		TestNumInst[15] <= 16'h0011;	TestAns[15] <= 16'h0000;	TestPassed[15] <= 1'b0; //slt
-		TestID[16] <= "17";		TestNumInst[16] <= 16'h0012;	TestAns[16] <= 16'h0000;	TestPassed[16] <= 1'b0; //sltu
+		TestID[5] <= "6";		TestNumInst[5] <= 16'h0006;		TestAns[5] <= 16'h0000;		TestPassed[5] <= 1'b0; //slti
+		TestID[6] <= "7";		TestNumInst[6] <= 16'h0007;		TestAns[6] <= 16'h0001;		TestPassed[6] <= 1'b0; //sltiu
+		TestID[7] <= "8";		TestNumInst[7] <= 16'h0008;		TestAns[7] <= 16'h0005;		TestPassed[7] <= 1'b0; //xori
+		TestID[8] <= "9";		TestNumInst[8] <= 16'h0009;		TestAns[8] <= 16'h0005;		TestPassed[8] <= 1'b0; //andi
+		TestID[9] <= "10";		TestNumInst[9] <= 16'h000a;		TestAns[9] <= 16'h000f;		TestPassed[9] <= 1'b0; //ori
+		TestID[10] <= "11";		TestNumInst[10] <= 16'h00b;		TestAns[10] <= 16'h001e;		TestPassed[10] <= 1'b0; //slli
+		TestID[11] <= "12";		TestNumInst[11] <= 16'h00c;	TestAns[11] <= 16'h000f;	TestPassed[11] <= 1'b0; //srli
+		TestID[12] <= "13";		TestNumInst[12] <= 16'h00d;	TestAns[12] <= 16'h0002;	TestPassed[12] <= 1'b0; //srai
+		TestID[13] <= "14";		TestNumInst[13] <= 16'h00e;	TestAns[13] <= 16'h0007;	TestPassed[13] <= 1'b0; //add
+		TestID[14] <= "15";		TestNumInst[14] <= 16'h00f;	TestAns[14] <= 16'h0002;	TestPassed[14] <= 1'b0; //sub
+		TestID[15] <= "16";		TestNumInst[15] <= 16'h0010;	TestAns[15] <= 16'h0014;	TestPassed[15] <= 1'b0; //sll
+		TestID[16] <= "17";		TestNumInst[16] <= 16'h0011;	TestAns[16] <= 16'h0000;	TestPassed[16] <= 1'b0; //slt
+		TestID[17] <= "18";		TestNumInst[17] <= 16'h0012;	TestAns[17] <= 16'h0000;	TestPassed[17] <= 1'b0; //sltu
 
-		TestID[17] <= "18";		TestNumInst[17] <= 16'h0013;		TestAns[17] <= 16'h0000;		TestPassed[17] <= 1'b0; //xor
-		TestID[18] <= "19";		TestNumInst[18] <= 16'h0014;		TestAns[18] <= 16'h000a;		TestPassed[18] <= 1'b0; //srl
-		TestID[19] <= "20";		TestNumInst[19] <= 16'h0015;		TestAns[19] <= 16'h000a;		TestPassed[19] <= 1'b0; //sra
-		TestID[20] <= "21";		TestNumInst[20] <= 16'h0016;		TestAns[20] <= 16'h001e;		TestPassed[20] <= 1'b0; //or
-		TestID[21] <= "22";		TestNumInst[21] <= 16'h0017;		TestAns[21] <= 16'h0014;		TestPassed[21] <= 1'b0; //and
+		TestID[18] <= "19";		TestNumInst[18] <= 16'h0013;		TestAns[18] <= 16'h0000;		TestPassed[18] <= 1'b0; //xor
+		TestID[19] <= "20";		TestNumInst[19] <= 16'h0014;		TestAns[19] <= 16'h000a;		TestPassed[19] <= 1'b0; //srl
+		TestID[20] <= "21";		TestNumInst[20] <= 16'h0015;		TestAns[20] <= 16'h000a;		TestPassed[20] <= 1'b0; //sra
+		TestID[21] <= "22";		TestNumInst[21] <= 16'h0016;		TestAns[21] <= 16'h001e;		TestPassed[21] <= 1'b0; //or
+		TestID[22] <= "23";		TestNumInst[22] <= 16'h0017;		TestAns[22] <= 16'h0014;		TestPassed[22] <= 1'b0; //and
 	end
 
 	always @ (posedge CLK) begin
