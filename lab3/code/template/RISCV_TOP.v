@@ -1,7 +1,7 @@
 module RISCV_TOP (
 	//General Signals
-	input wire CLK,
-	input wire RSTn,
+	input wire CLK, //every 5 sec
+	input wire RSTn, // every 101 sec
 
 	//I-Memory Signals
 	output wire I_MEM_CSN,
