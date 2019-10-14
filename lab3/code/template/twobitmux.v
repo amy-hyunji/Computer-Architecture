@@ -15,6 +15,10 @@ module TWOBITMUX (
 	reg [31:0] _OUTPUT;
 	assign OUTPUT = _OUTPUT;
 
+	initial begin
+		_OUTPUT = 0;
+	end
+
 	always@ (*) begin
 		if (SIGNAL == 2'b00) _OUTPUT = INPUT1;
 		else if (SIGNAL == 2'b01) _OUTPUT = INPUT2;

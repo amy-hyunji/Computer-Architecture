@@ -91,7 +91,7 @@ module CONTROL (
 		case (Instruction[6:0])
 		
 		7'b0110111: begin //LUI
-			D_MEM_WEN = 0;
+			D_MEM_WEN = 1;
 			BRANCH = 0;
 			RF_WE = 1;
 			REMUX = 2'b01;
@@ -104,7 +104,7 @@ module CONTROL (
 		7'b0010111: begin //AUIPC
 			ALUIMUX = 0;
 			ALUI = 4'b0000;
-			D_MEM_WEN = 0;
+			D_MEM_WEN = 1;
 			BRANCH = 0;
 			RF_WE = 1;
 			REMUX = 2'b01;
