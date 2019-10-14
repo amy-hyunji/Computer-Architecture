@@ -44,21 +44,23 @@ module RISCV_TOP (
 
 	// 여기서 I_MEM_CSN, D_MEM_CSN 처리 필요하지 않을까? - control은 그 뒤에 나오니까
 	
-	reg [31:0] PC, IMM, ALUR_OUT, LOADER_OUT, ALUPC_OUT, ALUIMUX_OUT, BRANCH_OUT;
-	wire ALUIMUX, ISBRANCH, BRANCH;
+	wire [31:0] PC, IMM, isJALR_OUT, ALUI_OUT, ALUR_OUT, LOADER_OUT, ALUPC_OUT, ALUIMUX_OUT, BRANCH_OUT;
+	wire ALUIMUX, ISBRANCH, BRANCH, ISJALR;
 	wire [1:0] REMUX;
 	wire [2:0] LFUNCT;
 	wire [3:0] ALUI, ALUR;
-
+	wire [11:0] INSTRUCTION;
+	assign INSTRUCTION = I_MEM_ADDR;
+	assign D_MEM_ADDR = ALUI_OUT[11:0];
 
 	PC pc (
 			.CLK(CLK), 
 			.RSTn(RSTn),
 			._PC(PC),
-			.I_MEM_ADDR(I_MEM_ADDR));
+			._I_MEM_ADDR(INSTRUCTION));
 
 	CONTROL control (
-			._Instruction(I_MEM_ADDR),
+			._Instruction(PC),
 			._RSTn(RSTn),
 			._ALUIMUX(ALUIMUX), 
 			._ALUI(ALUI),
@@ -78,27 +80,26 @@ module RISCV_TOP (
 			._HALT(HALT));
 
 	ALU aluI (
-			.ALU(ALUI),
+			.OP(ALUI),
 			.A(ALUIMUX_OUT),
 			.B(IMM), 
-			.Out(D_MEM_ADDR));
+			.Out(ALUI_OUT));
 
 	isJALR isjalr (
 			.ISJALR(ISJALR),
-			.ALUI_OUTPUT(D_MEM_ADDR),
+			.ALUI_OUTPUT(ALUI_OUT),
 			.OUTPUT(isJALR_OUT));
 
 	ONEBITMUX muxaluI(
 			.SIGNAL(ALUIMUX),
-			.INPUT1(I_MEM_ADDR),
+			.INPUT1(PC),
 			.INPUT2(RF_RD1),
 			.OUTPUT(ALUIMUX_OUT));
 
-	ALU #(
-		.ALU(4'b0000),
-		.B(32'b00000000000000000000000000000100)
-	)aluPC (
-		.A(I_MEM_ADDR),
+	ALU aluPC(
+		.OP(4'b0000),
+		.A(PC),
+		.B(32'b00000000000000000000000000000100),
 		.Out(ALUPC_OUT));
 
 	ONEBITMUX muxbranch (
@@ -114,7 +115,7 @@ module RISCV_TOP (
 		.OUTPUT(PC));
 
 	ALU alur (
-		.ALU(ALUR),
+		.OP(ALUR),
 		.A(RF_RD1),
 		.B(RF_RD2),
 		.Out(ALUR_OUT));
@@ -127,7 +128,7 @@ module RISCV_TOP (
 	TWOBITMUX twobitmux (
 		.SIGNAL(REMUX),
 		.INPUT1(ALUPC_OUT),
-		.INPUT2(D_MEM_ADDR),
+		.INPUT2(ALUI_OUT),
 		.INPUT3(LOADER_OUT),
 		.INPUT4(ALUR_OUT),
 		.OUTPUT(RF_WD));

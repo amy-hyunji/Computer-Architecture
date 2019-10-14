@@ -36,6 +36,7 @@ module LOADER (
 		3'b101: begin //LHU - load 16 bit from memory and zero extend to 32 bit
 			_LOADER_OUT[16:0] = {_D_MEM_DOUT[16:0], 16'b0000000000000000};
 		end
+		endcase
 	end
 
 endmodule

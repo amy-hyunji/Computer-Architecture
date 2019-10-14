@@ -9,7 +9,8 @@ module CONTROL (
 	output wire _BRANCH,
 	output wire [1:0] _REMUX,
 	output wire [2:0] _LFUNCT,
-
+	output wire _ISJALR,
+	
 	output wire _I_MEM_CSN,
 	output wire _D_MEM_CSN, 
 	output wire _D_MEM_WEN,
@@ -19,7 +20,7 @@ module CONTROL (
 	output wire [4:0] _RF_RA2,
 	output wire [4:0] _RF_WA1,
 	output wire [31:0] _IMM, 
-	output wire _HALT,
+	output wire _HALT
 	);
 
 	reg[31:0] Instruction;
@@ -30,6 +31,7 @@ module CONTROL (
 	reg BRANCH;
 	reg [1:0] REMUX;
 	reg [2:0] LFUNCT;
+	reg ISJALR;
 
 	reg D_MEM_WEN;
 	reg [3:0] D_MEM_BE;
@@ -40,7 +42,6 @@ module CONTROL (
 	reg [31:0] IMM;
 	reg HALT;
 
-	Instruction = _Instruction;
 	assign _ALUIMUX = ALUIMUX;
 	assign _ALUI = ALUI;
 	assign _ALUR = ALUR;
@@ -55,17 +56,20 @@ module CONTROL (
 	assign _RF_WA1 = RF_WA1;
 	assign _IMM = IMM;
 	assign _HALT = HALT;
+	assign _ISJALR = ISJALR;
 
 	assign _I_MEM_CSN = ~_RSTn;
 	assign _D_MEM_CSN = ~_RSTn;
 
 	initial begin
+		Instruction = _Instruction;
 		ALUIMUX = 0;
 		ALUI = 4'b0000;
 		ALUR = 4'b0000;
 		BRANCH = 0;
 		REMUX = 2'b00;
 		LFUNCT= 3'b000;
+		ISJALR = 1'b0;
 
 		D_MEM_WEN = 1;
 		D_MEM_BE = 4'b0000;
@@ -135,12 +139,12 @@ module CONTROL (
 			BRANCH = 0;
 			RF_WE = 1;
 			REMUX = 2'b00;
-			RE_RA1 = Instruction[19:15];
+			RF_RA1 = Instruction[19:15];
 			RF_WA1 = Instruction[11:7];
 			IMM[11:0] = Instruction[31:20];
 			if (Instruction[31] == 0) IMM[31:12] = 20'b00000000000000000000;
 			else IMM[31:12] = 20'b11111111111111111111;
-			ISJALR = 0;
+			ISJALR = 1;
 		end
 
 		7'b1100011: begin //BEQ, BNE, BLT, BGE, BLTU, BGEU,
@@ -161,17 +165,17 @@ module CONTROL (
 		   
 			case(Instruction[14:12])
 			3'b000: //BEQ
-				ALUR = 4b1010;
+				ALUR = 4'b1010;
 			3'b001: //BNE
-				ALUR = 4b1011;
+				ALUR = 4'b1011;
 			3'b100: //BLT
-				ALUR = 4b1100;
+				ALUR = 4'b1100;
 			3'b101: //BGE
-				ALUR = 4b1101;
+				ALUR = 4'b1101;
 			3'b110: //BLTU
-				ALUR = 4b1110;
+				ALUR = 4'b1110;
 			3'b111: //BGEU
-				ALUR = 4b1111;
+				ALUR = 4'b1111;
 			endcase
 		
 		end
