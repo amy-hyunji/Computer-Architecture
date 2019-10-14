@@ -1,10 +1,10 @@
-module controller (
+module CONTROL (
 
 	input wire [31:0] _Instruction, 
 	input wire _RSTn,
 
 	output wire _ALUIMUX,
-	output wire [2:0] _ALUI,
+	output wire [3:0] _ALUI,
 	output wire [3:0] _ALUR,
 	output wire _BRANCH,
 	output wire [1:0] _REMUX,
@@ -25,7 +25,7 @@ module controller (
 	reg[31:0] Instruction;
 
 	reg ALUIMUX;
-	reg [2:0] ALUI;
+	reg [3:0] ALUI;
 	reg [3:0] ALUR;
 	reg BRANCH;
 	reg [1:0] REMUX;
@@ -61,13 +61,13 @@ module controller (
 
 	initial begin
 		ALUIMUX = 0;
-		ALUI = 3'b000;
+		ALUI = 4'b0000;
 		ALUR = 4'b0000;
 		BRANCH = 0;
 		REMUX = 2'b00;
 		LFUNCT= 3'b000;
 
-		D_MEM_WEN = 0;
+		D_MEM_WEN = 1;
 		D_MEM_BE = 4'b0000;
 		RF_WE = 0;
 		RF_RA1 = 5'b00000;
@@ -145,11 +145,9 @@ module controller (
 		7'b1100011: //BEQ, BNE, BLT, BGE, BLTU, BGEU,
 			ALUIMUX = 0;
 			ALUI =  4'b0000;
-			ALUR = 4'b0001; //SUB
 			D_MEM_WEN = 1;
 			BRANCH = 1;
 			RF_WE = 0;
-			LFUNCT = Instruction[14:12];
 			RF_RA1 = Instruction[19:15];
 			RF_RA2 = Instruction[24:20];
 			IMM[3:0] = Instruction[11:8];
@@ -159,6 +157,21 @@ module controller (
 			if (Instruction[31] == 0) IMM[31:12] = 20'b00000000000000000000;
 			else IMM[31:12] = 20'b11111111111111111111;
 			ISJALR = 0;
+		   
+			case(Instruction[14:12])
+			3'b000: //BEQ
+				ALUR = 4b1010;
+			3'b001: //BNE
+				ALUR = 4b1011;
+			3'b100: //BLT
+				ALUR = 4b1100;
+			3'b101: //BGE
+				ALUR = 4b1101;
+			3'b110: //BLTU
+				ALUR = 4b1110;
+			3'b111: //BGEU
+				ALUR = 4b1111;
+
 
 		7'b0000011: //LB, LH, LW, LBU, LHU
 			ALUIMUX = 1;
@@ -260,4 +273,6 @@ module controller (
 			3'b111: //AND
 				ALUR = 4'b1001;
 				
-
+	   endcase
+	end
+endmodule
