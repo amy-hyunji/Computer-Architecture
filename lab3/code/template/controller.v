@@ -84,7 +84,7 @@ module CONTROL (
 			
 		end
 
-		case (opcode)
+		case (Instruction[6:0])
 		
 		7'b0110111: begin //LUI
 			D_MEM_WEN = 0;
@@ -128,7 +128,7 @@ module CONTROL (
 			ISJALR = 0;
 		end
 
-		7'b1100111: //JALR
+		7'b1100111: begin //JALR
 			ALUIMUX = 1;
 			ALUI = 4'b0000;
 			D_MEM_WEN = 1;
@@ -141,8 +141,9 @@ module CONTROL (
 			if (Instruction[31] == 0) IMM[31:12] = 20'b00000000000000000000;
 			else IMM[31:12] = 20'b11111111111111111111;
 			ISJALR = 0;
+		end
 
-		7'b1100011: //BEQ, BNE, BLT, BGE, BLTU, BGEU,
+		7'b1100011: begin //BEQ, BNE, BLT, BGE, BLTU, BGEU,
 			ALUIMUX = 0;
 			ALUI =  4'b0000;
 			D_MEM_WEN = 1;
@@ -171,9 +172,12 @@ module CONTROL (
 				ALUR = 4b1110;
 			3'b111: //BGEU
 				ALUR = 4b1111;
+			endcase
+		
+		end
 
 
-		7'b0000011: //LB, LH, LW, LBU, LHU
+		7'b0000011: begin //LB, LH, LW, LBU, LHU
 			ALUIMUX = 1;
 			ALUI = 4'b0000;
 			D_MEM_WEN =  1;
@@ -187,8 +191,9 @@ module CONTROL (
 			if (Instruction[31] == 0) IMM[31:12] = 20'b00000000000000000000;
 			else IMM[31:12] = 20'b11111111111111111111;
 			ISJALR = 0;
+		end
 
-		7'b0100011: //SB, SJ, SW
+		7'b0100011: begin //SB, SJ, SW
 			ALUIMUX = 1;
 			ALUI = 4'b0000;
 			D_MEM_WEN = 0;
@@ -209,8 +214,10 @@ module CONTROL (
 				D_MEM_BE = 4'b0011;
 			3'b010: //SW
 				D_MEM_BE = 4'b1111;
-				
-		7'b0010011: //ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI
+			endcase
+		end
+
+		7'b0010011: begin //ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI
 			ALUIMUX = 1;
 			D_MEM_WEN = 1;
 			BRANCH = 0;
@@ -243,8 +250,10 @@ module CONTROL (
 					ALUI = 4'b0110;
 				else //SRAI
 					ALUI = 4'b0111;
+			endcase
+		end
 
-		7'b0110011: //ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND
+		7'b0110011: begin //ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND
 			D_MEM_WEN = 1;
 			BRANCH = 0;
 			RF_WE = 1;
@@ -272,7 +281,9 @@ module CONTROL (
 				ALUR = 4'b1000;
 			3'b111: //AND
 				ALUR = 4'b1001;
-				
+			endcase
+		end
+
 	   endcase
 	end
 endmodule
