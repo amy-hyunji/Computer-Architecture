@@ -10,7 +10,7 @@ module ALU(A,B,OP,C,Cout);
 
 	//TODO
 	reg [15:0] K;
-	reg [1:0] Kout;
+	reg Kout;
 	assign Cout = Kout;
 	assign C = K;
 	always @(*) begin
