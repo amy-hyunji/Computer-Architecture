@@ -44,7 +44,7 @@ module RISCV_TOP (
 
 	// 여기서 I_MEM_CSN, D_MEM_CSN 처리 필요하지 않을까? - control은 그 뒤에 나오니까
 	
-	reg [31:0] PC, IMM, ALUR_OUT, ALUPC_OUT, ALUIMUX_OUT, BRANCH_OUT;
+	reg [31:0] PC, IMM, ALUR_OUT, LOADER_OUT, ALUPC_OUT, ALUIMUX_OUT, BRANCH_OUT;
 	wire ALUIMUX, ISBRANCH, BRANCH;
 	wire [1:0] REMUX;
 	wire [2:0] LFUNCT;
@@ -88,7 +88,7 @@ module RISCV_TOP (
 			.ALUI_OUTPUT(D_MEM_ADDR),
 			.OUTPUT(isJALR_OUT));
 
-	ONEBITMUX aluimux(
+	ONEBITMUX muxaluI(
 			.SIGNAL(ALUIMUX),
 			.INPUT1(I_MEM_ADDR),
 			.INPUT2(RF_RD1),
@@ -101,13 +101,13 @@ module RISCV_TOP (
 		.A(I_MEM_ADDR),
 		.Out(ALUPC_OUT));
 
-	ONEBITMUX isbranch (
+	ONEBITMUX muxbranch (
 		.SIGNAL(ISBRANCH),
 		.INPUT1(ALUPC_OUT),
 		.INPUT2(isJALR_OUT),
 		.OUTPUT(BRANCH_OUT));
 
-	ONEBITMUX isjump (
+	ONEBITMUX muxjump (
 		.SIGNAL(ISJUMP),
 		.INPUT1(BRANCH_OUT),
 		.INPUT2(isJALR_OUT),
@@ -118,6 +118,24 @@ module RISCV_TOP (
 		.A(RF_RD1),
 		.B(RF_RD2),
 		.Out(ALUR_OUT));
+
+	LOADER loader (
+		.LFUNCT(LFUNCT),
+		._D_MEM_DOUT(D_MEM_DOUT),
+		.LOADER_OUT(LOADER_OUT));
+
+	TWOBITMUX twobitmux (
+		.SIGNAL(REMUX),
+		.INPUT1(ALUPC_OUT),
+		.INPUT2(D_MEM_ADDR),
+		.INPUT3(LOADER_OUT),
+		.INPUT4(ALUR_OUT),
+		.OUTPUT(RF_WD));
+
+	isBRANCH isbranch (
+		._ALUR_OUT(ALUR_OUT),
+		._BRANCH(BRANCH),
+		._ISBRANCH(ISBRANCH));
 
 	
 
