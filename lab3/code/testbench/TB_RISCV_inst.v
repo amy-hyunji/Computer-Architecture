@@ -1,5 +1,5 @@
 `timescale 1ns/10ps
-`define NUM_TEST 22
+`define NUM_TEST 23
 `define TESTID_SIZE 5
 
 module TB_RISCV ();
@@ -65,7 +65,7 @@ module TB_RISCV ();
 
 	//I-Memory
 	SP_SRAM #(
-		.ROMDATA ("/Users/junahyung/csprojects/Computer_Architecture/lab3/code/testcase/hex/inst.hex"), //Initialize I-Memory
+		.ROMDATA ("C:\\2019F_EE312_project\\lab3_new\\inst.hex"), //Initialize I-Memory
 		.AWIDTH  (10),
 		.SIZE    (1024)
 	) i_mem1 (
