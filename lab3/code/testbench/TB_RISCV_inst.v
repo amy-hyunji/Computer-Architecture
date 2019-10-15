@@ -65,7 +65,7 @@ module TB_RISCV ();
 
 	//I-Memory
 	SP_SRAM #(
-		.ROMDATA ("C:\\2019F_EE312_project\\lab3_new\\inst.hex"), //Initialize I-Memory
+		.ROMDATA ("/Users/amy_hyunji/Documents/GitHub/Computer_Architecture/lab3/code/testcase/hex/inst.hex"), //Initialize I-Memory
 		.AWIDTH  (10),
 		.SIZE    (1024)
 	) i_mem1 (

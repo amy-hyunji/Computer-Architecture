@@ -14,8 +14,9 @@ module RISCV_CLKRST (
       #101 reset_n_q <= 1'b1;
     end
 
-  always @(clock_q)
+  always @(clock_q) begin
       #5 clock_q <= ~clock_q;
+	end
 
   assign CLK = clock_q;
   assign RSTn = reset_n_q;
