@@ -55,6 +55,12 @@ module RISCV_TOP (
 	assign D_MEM_DOUT = RF_RD2;
 	initial I_MEM_ADDR = 0;
 	
+	HALT halt (
+			._CLK(CLK),
+			._Instruction(I_MEM_DI),
+			._RF_RD1(RF_RD1),
+			._halt(HALT));
+
 
 	MPC pc (
 			.CLK(CLK), 
@@ -82,8 +88,7 @@ module RISCV_TOP (
 			._RF_RA1(RF_RA1),
 			._RF_RA2(RF_RA2),
 			._RF_WA1(RF_WA1),
-			._IMM(IMM),
-			._HALT(HALT));
+			._IMM(IMM));
 
 	ALU aluI (
 			.OP(ALUI),

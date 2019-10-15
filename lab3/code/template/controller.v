@@ -17,8 +17,7 @@ module CONTROL (
 	output wire	[4:0] _RF_RA1,
 	output wire [4:0] _RF_RA2,
 	output wire [4:0] _RF_WA1,
-	output wire [31:0] _IMM, 
-	output wire _HALT
+	output wire [31:0] _IMM 
 	);
 
 	reg[31:0] Instruction;
@@ -39,7 +38,6 @@ module CONTROL (
 	reg [4:0] RF_RA2;
 	reg [4:0] RF_WA1;
 	reg [31:0] IMM;
-	reg HALT;
 
 	assign _ALUIMUX = ALUIMUX;
 	assign _ALUI = ALUI;
@@ -54,7 +52,6 @@ module CONTROL (
 	assign _RF_RA2 = RF_RA2;
 	assign _RF_WA1 = RF_WA1;
 	assign _IMM = IMM;
-	assign _HALT = HALT;
 	assign _ISJALR = ISJALR;
 	assign _ISJUMP = ISJUMP;
 
@@ -76,16 +73,11 @@ module CONTROL (
 		RF_RA2 = 0;
 		RF_WA1 = 0;
 		IMM = 0;
-		HALT = 0;
 	end
 
 	always@ (*) begin
 		Instruction = _Instruction;
 		//$display ("CONTROLLLLLLLLLLLLLLLLLL %0b %0h", Instruction, Instruction);
-		if (Instruction == 32'h00008067) begin //HALT
-			//check if RF_RD1 register value is 0x0000000c -> turn to 1
-			
-		end
 
 		case (Instruction[6:0])
 		
