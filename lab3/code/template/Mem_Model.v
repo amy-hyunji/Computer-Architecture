@@ -31,7 +31,6 @@ module SP_SRAM #(parameter ROMDATA = "", AWIDTH = 12, SIZE = 4096) (
 				if (BE[1]) temp[15:8] = DI[15:8];
 				if (BE[2]) temp[23:16] = DI[23:16];
 				if (BE[3]) temp[31:24] = DI[31:24];
-
 				ram[ADDR] = temp;
 			end
 		end

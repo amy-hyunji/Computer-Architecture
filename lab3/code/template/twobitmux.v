@@ -15,11 +15,27 @@ module TWOBITMUX (
 	reg [31:0] _OUTPUT;
 	assign OUTPUT = _OUTPUT;
 
+	initial begin
+		_OUTPUT = 0;
+	end
+
 	always@ (*) begin
-		if (SIGNAL == 2'b00) _OUTPUT = INPUT1;
-		else if (SIGNAL == 2'b01) _OUTPUT = INPUT2;
-		else if (SIGNAL == 2'b10) _OUTPUT = INPUT3;
-		else _OUTPUT = INPUT4;
+		if (SIGNAL == 2'b00) begin
+//			$display("2'b00: %0b", INPUT1);
+			_OUTPUT = INPUT1;
+		end
+		else if (SIGNAL == 2'b01) begin
+//			$display("2'b01");
+			_OUTPUT = INPUT2;
+		end
+		else if (SIGNAL == 2'b10) begin 
+//			$display("2'b10");
+			_OUTPUT = INPUT3;
+		end
+		else begin
+//			$display("rest");
+			_OUTPUT = INPUT4;
+		end
 	end
 
 endmodule

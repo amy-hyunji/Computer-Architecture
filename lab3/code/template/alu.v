@@ -2,6 +2,7 @@ module ALU (
     input wire [3:0] OP,
     input wire [31:0] A,
     input wire [31:0] B,
+	 input wire [1:0] Check,
 
     output wire [31:0] Out
 );
@@ -13,10 +14,12 @@ module ALU (
     end
 
     always @ (*) begin
-        case (OP)
+        
+		case (OP)
             //add
-            4'b0000: Kout = A + B;
-
+            4'b0000: begin
+					Kout = A + B;
+				end
             //sub
             4'b0001: Kout = A - B;
             
