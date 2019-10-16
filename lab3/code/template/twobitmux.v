@@ -10,8 +10,6 @@ module TWOBITMUX (
 
 	);
 
-	// TWOBITMUX (REMUX, PC+4, rg1+IMM, memory_load, ALURoutput, RF_WD)
-
 	reg [31:0] _OUTPUT;
 	assign OUTPUT = _OUTPUT;
 
@@ -21,19 +19,15 @@ module TWOBITMUX (
 
 	always@ (*) begin
 		if (SIGNAL == 2'b00) begin
-//			$display("2'b00: %0b", INPUT1);
 			_OUTPUT = INPUT1;
 		end
 		else if (SIGNAL == 2'b01) begin
-//			$display("2'b01");
 			_OUTPUT = INPUT2;
 		end
 		else if (SIGNAL == 2'b10) begin 
-//			$display("2'b10");
 			_OUTPUT = INPUT3;
 		end
 		else begin
-//			$display("rest");
 			_OUTPUT = INPUT4;
 		end
 	end

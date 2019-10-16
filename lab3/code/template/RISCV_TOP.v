@@ -41,8 +41,6 @@ module RISCV_TOP (
 	end
 
 	// TODO: implement
-
-	// 여기서 I_MEM_CSN, D_MEM_CSN 처리 필요하지 않을까? - control은 그 뒤에 나오니까
 	
 	wire [31:0] TEMP_RF_WD, PC, PCOUT, IMM, isJALR_OUT, ALUI_OUT, ALUR_OUT, LOADER_OUT, ALUPC_OUT, ALUIMUX_OUT, BRANCH_OUT;
 	wire ALUIMUX, ISBRANCH, BRANCH, ISJALR, ISJUMP;
@@ -94,7 +92,6 @@ module RISCV_TOP (
 			.OP(ALUI),
 			.A(ALUIMUX_OUT),
 			.B(IMM), 
-			.Check(2'b00),
 			.Out(ALUI_OUT));
 
 	isJALR isjalr (
@@ -103,19 +100,16 @@ module RISCV_TOP (
 			.OUTPUT(isJALR_OUT));
 	
 	TRANSLATE i_translate (
-			.Check(1'b0),
 			.E_ADDR(PCOUT),
 			.WHICH(1'b0),
 			.T_ADDR(TEMP));
 
 	TRANSLATE d_translate (
-			.Check(1'b1),
 			.E_ADDR(ALUI_OUT),
 			.WHICH(1'b1),
 			.T_ADDR(D_MEM_ADDR));
 
 	ONEBITMUX muxaluI(
-			.Control(2'b10),
 			.SIGNAL(ALUIMUX),
 			.INPUT1(PCOUT),
 			.INPUT2(RF_RD1),
@@ -125,18 +119,15 @@ module RISCV_TOP (
 		.OP(4'b0000),
 		.A(PCOUT),
 		.B(32'b00000000000000000000000000000100),
-		.Check(2'b01),
 		.Out(ALUPC_OUT));
 
 	ONEBITMUX muxbranch (
-		.Control(2'b00),
 		.SIGNAL(ISBRANCH),
 		.INPUT1(ALUPC_OUT),
 		.INPUT2(isJALR_OUT),
 		.OUTPUT(BRANCH_OUT));
 
 	ONEBITMUX muxjump (
-		.Control(2'b01),
 		.SIGNAL(ISJUMP),
 		.INPUT1(BRANCH_OUT),
 		.INPUT2(isJALR_OUT),
@@ -146,7 +137,6 @@ module RISCV_TOP (
 		.OP(ALUR),
 		.A(RF_RD1),
 		.B(RF_RD2),
-		.Check(2'b10),
 		.Out(ALUR_OUT));
 
 	LOADER loader (
