@@ -54,7 +54,6 @@ module RISCV_TOP (
 	initial I_MEM_ADDR = 0;
 	
 	HALT halt (
-			._CLK(CLK),
 			._Instruction(I_MEM_DI),
 			._RF_RD1(RF_RD1),
 			._halt(HALT));

@@ -1,6 +1,5 @@
 module HALT(
 
-	input _CLK,
 	input [31:0] _Instruction,
 	input [31:0] _RF_RD1,
 
@@ -11,7 +10,7 @@ module HALT(
 	reg reg_halt;
 	assign _halt = reg_halt;
 
-	always@ (posedge _CLK) begin
+	always@ (*) begin
 		if ((_Instruction == 32'h00008067) & (_RF_RD1 == 32'h0000000c)) reg_halt = 1;
 		else  reg_halt = 0;
 	end
