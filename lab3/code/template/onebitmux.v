@@ -1,6 +1,5 @@
 module ONEBITMUX (
 
-	input wire [1:0] Control,
 	input wire SIGNAL,
 	input wire [31:0] INPUT1,
 	input wire [31:0] INPUT2,

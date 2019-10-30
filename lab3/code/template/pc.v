@@ -17,7 +17,6 @@ module MPC (
 	always@ (posedge CLK) begin
 		if (~RSTn) reg_PC_OUT = 0;
 		else reg_PC_OUT = _PC;
-//		$display("PC value: %0d", reg_PC_OUT);
 	end
 
 endmodule

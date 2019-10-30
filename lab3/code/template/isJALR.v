@@ -10,8 +10,8 @@ module isJALR (
 	reg[31:0] _OUTPUT;
 	assign OUTPUT = _OUTPUT;
 
-	always@ (ISJALR or ALUI_OUTPUT) begin
-		if (ISJALR == 1) _OUTPUT = {ALUI_OUTPUT[31:1], 1'b0};
+	always@ (*) begin
+		if (ISJALR == 1) _OUTPUT = ALUI_OUTPUT & 32'hfffffffe;
 		else  _OUTPUT = ALUI_OUTPUT;
 	end
 
