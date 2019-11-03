@@ -58,7 +58,8 @@ module CONTROL (
 	end
 
     always@ (negedge CLK) begin
-        if (RSTn & CUR_STATE_REG == 1) _NUMINST = _NUMINST + 1;
+        if (RSTn & CUR_STATE_REG == 1) _NUMINST <= _NUMINST + 1;
+        $display("NUM_INST : %s", _NUMINST);
     end
 
 	always@ (posedge CLK) begin
