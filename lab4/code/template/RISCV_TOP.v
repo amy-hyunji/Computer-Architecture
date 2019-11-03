@@ -52,6 +52,8 @@ module RISCV_TOP (
             $display("MUX1_OUT : %d", MUX1_OUT);
             $display("MUX2_OUT : %d", MUX2_OUT);
             $display("MUX2 control sig : %d", MUX2);
+            $display("OPCODE : %b", I_MEM_DI[6:0]);
+            $display("PC : %d", I_MEM_ADDR);
 
             $display("ALUOUT_D : %d", ALUOUT_D);
             $display("ALU_D : %d", ALU_D);
