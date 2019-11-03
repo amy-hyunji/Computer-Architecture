@@ -8,7 +8,7 @@ module CONTROLREG(
  
 		);
 
-		reg _VAL;
+		reg[31:0] _VAL;
 
 		assign OUT_VAL = _VAL;
 

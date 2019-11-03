@@ -43,10 +43,15 @@ module RISCV_TOP (
 
 	assign D_MEM_DOUT = B_OUT; 
 
-	always@ (*) begin
-		I_MEM_ADDR = TEMP;
-        NUM_INST = _NUM_INST;
-        $display("NUM_INST : %s", NUM_INST);
+	always@ (posedge CLK) begin
+		I_MEM_ADDR <= TEMP;
+        NUM_INST <= _NUM_INST;
+        $display("NUM_INST : %d", NUM_INST);
+        $display("REWR_MUX : %d", REWR_MUX);
+        $display("ALUOUT_D : %d", ALUOUT_D);
+        $display("ALU_D : %d", ALU_D);
+        $display("--------------------");
+
 	end
 
 	INSTREG instreg (
