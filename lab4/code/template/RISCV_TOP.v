@@ -33,7 +33,7 @@ module RISCV_TOP (
 	assign OUTPUT_PORT = RF_WD;
 
 	wire ZERO, MUX1, MUX4, ALU_WR, PC_WR, PC_WRITE_COND, IR_WR, REWR_MUX;
-	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT;
+	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT, _NUM_INST;
 	wire [11:0] TEMP;
 	wire [10:0] ALU_CONTROL;
 	wire [6:0] OPCODE, FUNCT7;
@@ -45,6 +45,7 @@ module RISCV_TOP (
 
 	always@ (*) begin
 		I_MEM_ADDR = TEMP;
+        NUM_INST = _NUM_INST;
 	end
 
 	INSTREG instreg (
@@ -77,7 +78,7 @@ module RISCV_TOP (
 			._D_MEM_BE(D_MEM_BE),
 			._MUX2(MUX2),
 			._ALU_CONTROL(ALU_CONTROL),
-            .NUM_INST(NUM_INST)
+            .NUM_INST(_NUM_INST)
 			);
 
 	HALT halt (
