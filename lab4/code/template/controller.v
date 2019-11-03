@@ -18,7 +18,7 @@ module CONTROL (
 	reg MUX1, MUX4, ALU_WR, D_MEM_CSN, I_MEM_CSN, PC_WR, RF_WE, PC_WRITE_COND, IR_WR, D_MEM_WEN, REWR_MUX, D_MEM_BE;
 	reg [1:0] MUX2;
 	reg [10:0] ALU_CONTROL;
-    reg [31:0] _NUMINST;
+   reg [31:0] _NUMINST;
 
 	assign CUR_STATE = CUR_STATE_REG;
 	assign NXT_STATE = NXT_STATE_REG;
@@ -88,7 +88,7 @@ module CONTROL (
 			7'b1100011: //br
 				NXT_STATE_REG <= 4'b0100;
 			default: //rest
-				NXT_STATE_REG <= 4'b0001;
+				NXT_STATE_REG <= 4'b0010;
 			endcase
 		end
 

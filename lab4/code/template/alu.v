@@ -21,8 +21,11 @@ module ALU (
 		case (OP)
 
 				//add
-            5'b00000: Kout = A + B;
-            
+            5'b00000: begin
+					Kout = A + B;
+					$display("A: %b, B: %b, ALU OUTPUT: %b", A, B, Kout);
+				end
+
 				//sub
             5'b00001: Kout = A - B;
             

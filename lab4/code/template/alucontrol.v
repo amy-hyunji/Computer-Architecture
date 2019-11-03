@@ -14,12 +14,16 @@ module ALUCONTROL (
 	assign CONTROLOUT = _CONTROLOUT;
 
 	initial begin
-		OP = ALU_CONTROL[10:4];
-		STATE = ALU_CONTROL[3:0];
+		OP = 0;
+		STATE = 0;
 		_CONTROLOUT = 0;
 	end
 
 	always@ (*) begin
+		
+		OP = ALU_CONTROL[10:4];
+		STATE = ALU_CONTROL[3:0];
+
 		if (STATE == 4'b0001) //IF 
 			_CONTROLOUT <= 5'b00000;
 		else if (STATE == 4'b0011) //JAL ID
