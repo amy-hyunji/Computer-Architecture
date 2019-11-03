@@ -39,7 +39,7 @@ module CONTROL (
 	assign _I_MEM_CSN = I_MEM_CSN;
 
 	initial begin
-        _NUMINST <= -1;
+        _NUMINST <= 0;
 		CUR_STATE_REG <= 1;
 		NXT_STATE_REG <= 1;
 		MUX1 <= 0;
@@ -93,8 +93,18 @@ module CONTROL (
 				NXT_STATE_REG <= 4'b0011;
 			7'b1100011: //br
 				NXT_STATE_REG <= 4'b0100;
-			default: //rest
+            7'b0110011: //r
 				NXT_STATE_REG <= 4'b0010;
+            7'b0010011: //I
+				NXT_STATE_REG <= 4'b0010;
+            7'b0000011: //LD
+				NXT_STATE_REG <= 4'b0010;
+            7'b0100011: //SW
+				NXT_STATE_REG <= 4'b0010;
+            7'b1100111: //jalr
+				NXT_STATE_REG <= 4'b0010;
+			default: //rest
+				NXT_STATE_REG <= 4'b0001;
 			endcase
 		end
 

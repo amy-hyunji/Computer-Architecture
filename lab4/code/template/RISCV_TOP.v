@@ -46,15 +46,17 @@ module RISCV_TOP (
 	always@ (posedge CLK) begin
 		I_MEM_ADDR <= TEMP;
         NUM_INST <= _NUM_INST;
-        $display("NUM_INST : %d", NUM_INST);
-        $display("REWR_MUX : %d", REWR_MUX);
-        $display("MUX1_OUT : %d", MUX1_OUT);
-        $display("MUX2_OUT : %d", MUX2_OUT);
-        $display("MUX2 control sig : %d", MUX2);
+        if (RSTn) begin
+            $display("NUM_INST : %d", NUM_INST);
+            $display("REWR_MUX : %d", REWR_MUX);
+            $display("MUX1_OUT : %d", MUX1_OUT);
+            $display("MUX2_OUT : %d", MUX2_OUT);
+            $display("MUX2 control sig : %d", MUX2);
 
-        $display("ALUOUT_D : %d", ALUOUT_D);
-        $display("ALU_D : %d", ALU_D);
-        $display("--------------------");
+            $display("ALUOUT_D : %d", ALUOUT_D);
+            $display("ALU_D : %d", ALU_D);
+            $display("--------------------");
+        end
 
 	end
 
