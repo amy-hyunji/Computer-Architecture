@@ -46,6 +46,7 @@ module RISCV_TOP (
 	always@ (*) begin
 		I_MEM_ADDR = TEMP;
         NUM_INST = _NUM_INST;
+        $display("NUM_INST : %s", NUM_INST);
 	end
 
 	INSTREG instreg (
