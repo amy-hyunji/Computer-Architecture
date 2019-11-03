@@ -32,14 +32,14 @@ module RISCV_TOP (
 	// TODO: implement multi-cycle CPU
 	assign OUTPUT_PORT = RF_WD;
 
-	wire ZERO, MUX1, MUX4, ALU_WR, PC_WR, PC_WRITE_COND, IR_WR, REWR_MUX;
-	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT, _NUM_INST;
+	wire ZERO, MUX1, PC_WR, PC_WRITE_COND, IR_WR, REWR_MUX;
+	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT, _NUM_INST, JALR_D, JALROUT_D;
 	wire [11:0] TEMP;
 	wire [10:0] ALU_CONTROL;
 	wire [6:0] OPCODE, FUNCT7;
 	wire [4:0] OP;
 	wire [2:0] FUNCT3;
-	wire [1:0] MUX2;
+	wire [1:0] MUX2, MUX4;
 
 	assign D_MEM_DOUT = B_OUT; 
 
@@ -65,7 +65,7 @@ module RISCV_TOP (
 			.INSTRUCTION(I_MEM_DI),
 			.OPCODE(OPCODE),
 			.IMMEDIATE(IMMEDIATE),
-            .IRWRITE(IR_WR),
+         .IRWRITE(IR_WR),
 			.RS1(RF_RA1),
 			.RS2(RF_RA2),
 			.FUNCT3(FUNCT3),
@@ -79,7 +79,6 @@ module RISCV_TOP (
 			.CLK(CLK),
 			._MUX1(MUX1),
 			._MUX4(MUX4),
-			._ALU_WR(ALU_WR),
 			._PC_WR(PC_WR),
 			._RF_WE(RF_WE),
 			._PC_WRITE_COND(PC_WRITE_COND),
@@ -102,14 +101,12 @@ module RISCV_TOP (
 	CONTROLREG pc (
 			.CLK(CLK),
 			.WREN((ZERO & PC_WRITE_COND) | PC_WR),
-            .RSTn(RSTn),
+         .RSTn(RSTn),
 			.IN_VAL(PC_IN),
 			.OUT_VAL(PC_OUT));
 
-	CONTROLREG aluout (
+	REG aluout (
 			.CLK(CLK),
-			.WREN(ALU_WR),
-            .RSTn(RSTn),
 			.IN_VAL(ALU_D),
 			.OUT_VAL(ALUOUT_D));
 
@@ -122,6 +119,11 @@ module RISCV_TOP (
 			.CLK(CLK),
 			.IN_VAL(RF_RD2),
 			.OUT_VAL(B_OUT));
+
+	REG jalrreg(
+			.CLK(CLK),
+			.IN_VAL(JALR_D),
+			.OUT_VAL(JALROUT_D));
 
 	TRANSLATE i_translate (
 		.E_ADDR(PC_OUT),
@@ -137,10 +139,12 @@ module RISCV_TOP (
 			.INPUT2(A_OUT),
 			.OUTPUT(MUX1_OUT));
 
-	ONEBITMUX mux4 (
+	TWOBITMUX mux4 (
 			.SIGNAL(MUX4),
 			.INPUT1(ALU_D),
-			.INPUT2(ALUOUT_D),
+			.INPUT2(JALROUT_D),
+			.INPUT3(ALUOUT_D),
+			.INPUT4(0),
 			.OUTPUT(PC_IN));
 
 	ONEBITMUX MREWR_MUX (
@@ -156,6 +160,12 @@ module RISCV_TOP (
 			.INPUT3(IMMEDIATE),
 			.INPUT4(0),
 			.OUTPUT(MUX2_OUT)
+			);
+
+	ISJALR isjalr(
+			.A(A_OUT),
+			.IMM(IMMEDIATE),
+			.JALR_OUT(JALR_D)
 			);
 
 	ALU alu (
