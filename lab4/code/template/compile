@@ -1,0 +1,2 @@
+iverilog -o risktop.vvp *.v ../testbench/TB_RISCV_inst.v
+vvp risktop.vvp

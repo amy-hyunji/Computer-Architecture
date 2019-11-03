@@ -77,6 +77,7 @@ module INSTREG(
 				_IMMEDIATE[11:0] = INSTRUCTION[31:20];
 				if (_IMMEDIATE[11] == 0) _IMMEDIATE[31:12] = 0;
 				else _IMMEDIATE[31:12] = 1;
+				$display("IMMEDIATE: %b", _IMMEDIATE);
 			end
 			7'b1100011: begin // BR
 				_IMMEDIATE[0] = 0;

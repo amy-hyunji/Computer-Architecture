@@ -82,7 +82,7 @@ module CONTROL (
 			PC_WRITE_COND <= 0;
 			I_MEM_CSN <= ~RSTn;
 			D_MEM_CSN <= ~RSTn;
-
+			$display("IF STAGE");
 			case(OPCODE)
 			7'b1101111: //jal
 				NXT_STATE_REG <= 4'b0011;
@@ -101,6 +101,7 @@ module CONTROL (
 			D_MEM_WEN <= 0;
 			I_MEM_CSN <= ~RSTn;
 			D_MEM_CSN <= ~RSTn;
+			$display ("ID STAGE");
 
 			case(OPCODE)
 			7'b0110011: //r-type
@@ -159,6 +160,7 @@ module CONTROL (
 			D_MEM_WEN <= 1;
 			I_MEM_CSN <= ~RSTn;
 			D_MEM_CSN <= ~RSTn;
+			$display("EX STAGE");
 			
 			case (OPCODE)
 			7'b0010011: //11 - I WB
@@ -257,6 +259,7 @@ module CONTROL (
 			NXT_STATE_REG <= 4'b0001;
 			I_MEM_CSN <= ~RSTn;
 			D_MEM_CSN <= ~RSTn;
+			$display ("WB STAGE");
 		end
 
 	

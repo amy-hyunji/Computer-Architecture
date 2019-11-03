@@ -64,6 +64,7 @@ module RISCV_TOP (
 			.OPCODE(OPCODE),
 			.RSTn(RSTn),
 			.CLK(CLK),
+			._D_MEM_BE(D_MEM_BE),
 			._MUX1(MUX1),
 			._MUX4(MUX4),
 			._ALU_WR(ALU_WR),
@@ -75,10 +76,9 @@ module RISCV_TOP (
 			._REWR_MUX(REWR_MUX),
 			._I_MEM_CSN(I_MEM_CSN),
 			._D_MEM_CSN(D_MEM_CSN),
-			._D_MEM_BE(D_MEM_BE),
 			._MUX2(MUX2),
 			._ALU_CONTROL(ALU_CONTROL),
-            .NUM_INST(_NUM_INST)
+         .NUM_INST(_NUM_INST)
 			);
 
 	HALT halt (
@@ -90,12 +90,14 @@ module RISCV_TOP (
 			.CLK(CLK),
 			.WREN((ZERO & PC_WRITE_COND) | PC_WR),
 			.IN_VAL(PC_IN),
+			.IS_ALU(1'b0),
 			.OUT_VAL(PC_OUT));
 
 	CONTROLREG aluout (
 			.CLK(CLK),
 			.WREN(ALU_WR),
 			.IN_VAL(ALU_D),
+			.IS_ALU(1'b1),
 			.OUT_VAL(ALUOUT_D));
 
 	REG A (
@@ -120,18 +122,21 @@ module RISCV_TOP (
 			.SIGNAL(MUX1),
 			.INPUT1(PC_OUT),
 			.INPUT2(A_OUT),
+			.CHECK(0),
 			.OUTPUT(MUX1_OUT));
 
 	ONEBITMUX mux4 (
 			.SIGNAL(MUX4),
 			.INPUT1(ALU_D),
 			.INPUT2(ALUOUT_D),
+			.CHECK(0),
 			.OUTPUT(PC_IN));
 
 	ONEBITMUX MREWR_MUX (
 			.SIGNAL(REWR_MUX),
 			.INPUT1(ALUOUT_D),
 			.INPUT2(D_MEM_DI),
+			.CHECK(1),
 			.OUTPUT(RF_WD));
 
 	TWOBITMUX mux2(
