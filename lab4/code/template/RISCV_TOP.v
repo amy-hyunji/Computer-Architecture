@@ -50,6 +50,7 @@ module RISCV_TOP (
         $display("REWR_MUX : %d", REWR_MUX);
         $display("MUX1_OUT : %d", MUX1_OUT);
         $display("MUX2_OUT : %d", MUX2_OUT);
+        $display("MUX2 control sig : %d", MUX2);
 
         $display("ALUOUT_D : %d", ALUOUT_D);
         $display("ALU_D : %d", ALU_D);
@@ -99,12 +100,14 @@ module RISCV_TOP (
 	CONTROLREG pc (
 			.CLK(CLK),
 			.WREN((ZERO & PC_WRITE_COND) | PC_WR),
+            .RSTn(RSTn),
 			.IN_VAL(PC_IN),
 			.OUT_VAL(PC_OUT));
 
 	CONTROLREG aluout (
 			.CLK(CLK),
 			.WREN(ALU_WR),
+            .RSTn(RSTn),
 			.IN_VAL(ALU_D),
 			.OUT_VAL(ALUOUT_D));
 
