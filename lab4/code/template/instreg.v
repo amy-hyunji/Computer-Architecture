@@ -2,6 +2,7 @@ module INSTREG(
 
 		input CLK,
 		input [31:0] INSTRUCTION,
+        input IRWRITE,
 
 		output [6:0] OPCODE,
 		output [31:0] IMMEDIATE,
@@ -39,7 +40,7 @@ module INSTREG(
 			_RD = 0;
 		end
 
-		always@ (posedge CLK) begin
+		always@ (posedge CLK & IRWRITE) begin
 			_RS1 <= INSTRUCTION[19:15];
 			_RS2 <= INSTRUCTION[24:20];
 			_RD <= INSTRUCTION[11:7];

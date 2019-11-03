@@ -48,6 +48,9 @@ module RISCV_TOP (
         NUM_INST <= _NUM_INST;
         $display("NUM_INST : %d", NUM_INST);
         $display("REWR_MUX : %d", REWR_MUX);
+        $display("MUX1_OUT : %d", MUX1_OUT);
+        $display("MUX2_OUT : %d", MUX2_OUT);
+
         $display("ALUOUT_D : %d", ALUOUT_D);
         $display("ALU_D : %d", ALU_D);
         $display("--------------------");
@@ -59,6 +62,7 @@ module RISCV_TOP (
 			.INSTRUCTION(I_MEM_DI),
 			.OPCODE(OPCODE),
 			.IMMEDIATE(IMMEDIATE),
+            .IRWRITE(IR_WR),
 			.RS1(RF_RA1),
 			.RS2(RF_RA2),
 			.FUNCT3(FUNCT3),
