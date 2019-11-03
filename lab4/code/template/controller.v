@@ -15,7 +15,7 @@ module CONTROL (
 	wire [3:0] NXT_STATE;
 	reg[3:0] CUR_STATE_REG;
 	reg[3:0] NXT_STATE_REG;
-	reg MUX1, D_MEM_CSN, I_MEM_CSN, PC_WR, RF_WE, PC_WRITE_COND, IR_WR, D_MEM_WEN, REWR_MUX, D_MEM_BE;
+	reg MUX1, PC_WR, RF_WE, PC_WRITE_COND, IR_WR, D_MEM_WEN, REWR_MUX, D_MEM_BE;
 	reg [1:0] MUX4, MUX2;
 	reg [10:0] ALU_CONTROL;
    reg [31:0] _NUMINST;
@@ -33,9 +33,10 @@ module CONTROL (
 	assign _REWR_MUX = REWR_MUX;
 	assign _D_MEM_BE = D_MEM_BE;
 	assign _ALU_CONTROL = ALU_CONTROL;
-    assign NUM_INST = _NUMINST; 
-	assign _D_MEM_CSN = D_MEM_CSN;
-	assign _I_MEM_CSN = I_MEM_CSN;
+   assign NUM_INST = _NUMINST; 
+	assign _I_MEM_CSN = ~RSTn;
+	assign _D_MEM_CSN = ~RSTn;
+		
 
 	initial begin
       _NUMINST <= 0;
