@@ -4,7 +4,7 @@ module ALUCONTROL (
 		input wire [2:0] FUNCT3,
 		input wire [6:0] FUNCT7,
 
-		output wire [4:0] CONTROLOUT
+		output wire [3:0] CONTROLOUT
 		);
 
 	reg [6:0] OP;
@@ -25,84 +25,85 @@ module ALUCONTROL (
 		STATE = ALU_CONTROL[3:0];
 
 		if (STATE == 4'b0001) //IF 
-			_CONTROLOUT <= 5'b00000;
-		else if (STATE == 4'b0011) //JAL ID
-			_CONTROLOUT <= 5'b00000;
-		else if (STATE == 4'b0100) //BR ID
-			_CONTROLOUT <= 5'b00000;
-		else if (STATE == 4'b1000) // JALR EX
-			_CONTROLOUT <= 5'b10000;
+			_CONTROLOUT = 4'b0000;
+		else if (STATE == 4'b0010) //ID
+			_CONTROLOUT = 4'b0000;
+		else if (STATE == 4'b0011) // STAGE3
+			_CONTROLOUT = 4'b0000;
+		else if (STATE == 4'b1000) // STAGE8
+			_CONTROLOUT = 4'b0000;
 		else if (STATE == 4'b0101 & OP == 7'b0000011) // LW EX
-			_CONTROLOUT <= 5'b00000;
-		else if (STATE == 4'b0110 & OP == 7'b0100011) // SW EX
-			_CONTROLOUT <= 5'b00000;
+			_CONTROLOUT = 4'b0000;
+		else if (STATE == 4'b0101 & OP == 7'b0100011) // SW EX
+			_CONTROLOUT = 4'b0000;
 		else if (STATE == 4'b0111 & OP == 7'b0110011) begin// R-type EX
 			if (FUNCT7 == 7'b0000000) begin
 				case (FUNCT3)
-				3'b000: 
-					_CONTROLOUT <= 5'b00000;
-				3'b001:
-					_CONTROLOUT <= 5'b00010;
-				3'b010:
-					_CONTROLOUT <= 5'b00011;
-				3'b011:
-					_CONTROLOUT <= 5'b00100;
-				3'b100:
-					_CONTROLOUT <= 5'b00101;
-				3'b101:
-					_CONTROLOUT <= 5'b00110;
-				3'b110:
-					_CONTROLOUT <= 5'b01000;
-				3'b111:
-					_CONTROLOUT <= 5'b01001;
+				3'b000: //add 
+					_CONTROLOUT = 4'b0000;
+				3'b001: //sll
+					_CONTROLOUT = 4'b0010;
+				3'b010: //slt
+					_CONTROLOUT = 4'b0011;
+				3'b011: //sltu
+					_CONTROLOUT = 4'b0100;
+				3'b100: //xor
+					_CONTROLOUT = 4'b0101;
+				3'b101: //srl
+					_CONTROLOUT = 4'b0110;
+				3'b110: //or
+					_CONTROLOUT = 4'b1000;
+				3'b111: //and
+					_CONTROLOUT = 4'b1001;
 				endcase
 			end
 			else begin
 				case (FUNCT3)
-				3'b000:
-					_CONTROLOUT <= 5'b00001;
-				3'b101:
-					_CONTROLOUT <= 5'b00111;
+				3'b000: //sub
+					_CONTROLOUT = 4'b0001;
+				3'b101: //sra
+					_CONTROLOUT = 4'b0111;
 				endcase
 			end
 		end
 		else if (STATE == 4'b0101 & OP == 7'b0010011) begin // I-type EX
 			case (FUNCT3)
-			3'b000:
-				_CONTROLOUT <= 5'b00000;
-			3'b010:
-				_CONTROLOUT <= 5'b00011;
-			3'b011:
-				_CONTROLOUT <= 5'b00100;
-			3'b100:
-				_CONTROLOUT <= 5'b00101;
+			3'b000: //addi
+				_CONTROLOUT = 4'b0000;
+			3'b010: //slti
+				_CONTROLOUT = 4'b0011;
+			3'b011: //sltiu
+				_CONTROLOUT = 4'b0100;
+			3'b100: //xori
+				_CONTROLOUT = 4'b0101;
 			3'b110: //ori
-				_CONTROLOUT <= 5'b01000;
+				_CONTROLOUT = 4'b1000;
 			3'b111: //andi
-				_CONTROLOUT <= 5'b01001;
-			3'b001:
-				_CONTROLOUT <= 5'b00010;
-			3'b101:
-				if (FUNCT7 == 7'b0000000)
-					_CONTROLOUT <= 5'b00110;
-				else if (FUNCT7 == 7'b0100000)
-					_CONTROLOUT <= 5'b00111;
+				_CONTROLOUT = 4'b1001;
+			3'b001: //slli
+				_CONTROLOUT = 4'b0010;
+			3'b101: begin//srli, srai
+				if (FUNCT7 == 7'b0000000) //srli
+					_CONTROLOUT = 4'b0110;
+				else if (FUNCT7 == 7'b0100000) //srai
+					_CONTROLOUT = 4'b0111;
+				end
 			endcase
 		end
 		else if (STATE == 4'b1001 & OP == 7'b1100011) begin
 			case (FUNCT3)
 			3'b000: //beq
-				_CONTROLOUT <= 5'b01010;
+				_CONTROLOUT = 4'b1010;
 			3'b001: //bne
-				_CONTROLOUT <= 5'b01011;
+				_CONTROLOUT = 4'b1011;
 			3'b100: //blt
-				_CONTROLOUT <= 5'b01100;
+				_CONTROLOUT = 4'b1100;
 			3'b101: //bge
-				_CONTROLOUT <= 5'b01101;
+				_CONTROLOUT = 4'b1101;
 			3'b110: //bltu
-				_CONTROLOUT <= 5'b01110;
+				_CONTROLOUT = 4'b1110;
 			3'b111: //bgeu
-				_CONTROLOUT <= 5'b01111;
+				_CONTROLOUT = 4'b1111;
 			endcase
 		end
 	end

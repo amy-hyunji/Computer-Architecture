@@ -6,7 +6,7 @@ module CONTROL (
 
 	output wire [3:0] _D_MEM_BE,
 	output wire _MUX1, _PC_WR, _RF_WE, _PC_WRITE_COND, _IR_WR, _D_MEM_WEN, _REWR_MUX, _I_MEM_CSN, _D_MEM_CSN,  
-	output wire [1:0] _MUX2, _MUX4 
+	output wire [1:0] _MUX2, _MUX4, 
 	output wire [10:0] _ALU_CONTROL,
    output wire [31:0] NUM_INST
 	);
@@ -38,7 +38,7 @@ module CONTROL (
 	assign _I_MEM_CSN = I_MEM_CSN;
 
 	initial begin
-        _NUMINST <= 0;
+      _NUMINST <= 0;
 		CUR_STATE_REG <= 1;
 		NXT_STATE_REG <= 1;
 		MUX1 <= 0;
@@ -81,7 +81,8 @@ module CONTROL (
 		PC_WRITE_COND <= 0;
 		IR_WR <= 1;
 		D_MEM_WEN <= 1;
-		NXT_STATE <= 4'b0010;
+		if (RSTn) NXT_STATE_REG <= 4'b0010;
+		else NXT_STATE_REG <= 4'b0001;
 		end
 
 		4'b0010: begin
@@ -96,21 +97,21 @@ module CONTROL (
 		D_MEM_WEN <= 1;
 		case (OPCODE)
 		7'b1101111: //JAL
-			NXT_STATE <= 4'b0011;
+			NXT_STATE_REG <= 4'b0011;
 		7'b0010011: //I_TYPE
-			NXT_STATE <= 4'b0101;
+			NXT_STATE_REG <= 4'b0101;
 		7'b0110011: //R_TYPE
-			NXT_STATE <= 4'b0111;
+			NXT_STATE_REG <= 4'b0111;
 		7'b1100111: //JALR
-			NXT_STATE <= 4'b1000;
+			NXT_STATE_REG <= 4'b1000;
 		7'b1100011: //BR
-			NXT_STATE <= 4'b1001;
+			NXT_STATE_REG <= 4'b1001;
 		7'b0000011: //LD
-			NXT_STATE <= 4'b0101;
+			NXT_STATE_REG <= 4'b0101;
 		7'b0100011: //SW
-			NXT_STATE <= 4'b0101;
+			NXT_STATE_REG <= 4'b0101;
 		default:
-			NXT_STATE <= 4'b0001;
+			NXT_STATE_REG <= 4'b0001;
 		endcase
 		end
 
@@ -124,7 +125,7 @@ module CONTROL (
 		PC_WRITE_COND <= 0;
 		IR_WR <= 0;
 		D_MEM_WEN <= 1;
-		NXT_STATE <= 4'b1011;
+		NXT_STATE_REG <= 4'b1011;
 		end
 
 		4'b0100: begin
@@ -134,7 +135,7 @@ module CONTROL (
 		IR_WR <= 0;
 		D_MEM_WEN <= 0;
 		D_MEM_BE <= 4'b1111;
-		NXT_STATE <= 4'b0001;
+		NXT_STATE_REG <= 4'b0001;
 		end
 
 		4'b0101: begin
@@ -148,11 +149,11 @@ module CONTROL (
 		D_MEM_WEN <= 1;
 		case (OPCODE)
 		7'b0100011: //SW
-			NXT_STATE <= 4'b0100;
+			NXT_STATE_REG <= 4'b0100;
 		7'b0000011: //LD
-			NXT_STATE <= 4'b1100;
+			NXT_STATE_REG <= 4'b1100;
 		7'b0010011: //I_TYPE
-			NXT_STATE <= 4'b1011;
+			NXT_STATE_REG <= 4'b1011;
 		endcase
 		end
 
@@ -162,8 +163,8 @@ module CONTROL (
 		PC_WRITE_COND <= 0;
 		IR_WR <= 0;
 		D_MEM_WEN <= 1;
-		REMR_MUX <= 1;
-		NXT_STATE <= 4'b0001;
+		REWR_MUX <= 1;
+		NXT_STATE_REG <= 4'b0001;
 		end
 
 		4'b0111: begin
@@ -175,7 +176,7 @@ module CONTROL (
 		PC_WRITE_COND <= 0;
 		IR_WR <= 0;
 		D_MEM_WEN <= 1;
-		NXT_STATE <= 4'b1011;
+		NXT_STATE_REG <= 4'b1011;
 		end
 
 		4'b1000: begin
@@ -188,7 +189,7 @@ module CONTROL (
 		PC_WRITE_COND <= 0;
 		IR_WR <= 0;
 		D_MEM_WEN <= 1;
-		NXT_STATE <= 4'b1011;
+		NXT_STATE_REG <= 4'b1011;
 		end
 
 		4'b1001: begin
@@ -201,7 +202,7 @@ module CONTROL (
 		PC_WRITE_COND <= 1;
 		IR_WR <= 0;
 		D_MEM_WEN <= 1;
-		NXT_STATE <= 4'b1010;
+		NXT_STATE_REG <= 4'b1010;
 		end
 
 		4'b1010: begin
@@ -212,7 +213,7 @@ module CONTROL (
 		PC_WRITE_COND <= 0;
 		IR_WR <= 0;
 		D_MEM_WEN <= 1;
-		NXT_STATE <= 4'b0001;
+		NXT_STATE_REG <= 4'b0001;
 		end
 
 		4'b1011: begin
@@ -222,7 +223,7 @@ module CONTROL (
 		IR_WR <= 0;
 		D_MEM_WEN <= 1;
 		REWR_MUX <= 0;
-		NXT_STATE <= 4'b0001;
+		NXT_STATE_REG <= 4'b0001;
 		end
 
 		4'b1100: begin
@@ -231,7 +232,7 @@ module CONTROL (
 		PC_WRITE_COND <= 0;
 		IR_WR <= 0;
 		D_MEM_WEN <= 1;
-		NXT_STATE <= 4'b0110;
+		NXT_STATE_REG <= 4'b0110;
 		end
 
 		endcase

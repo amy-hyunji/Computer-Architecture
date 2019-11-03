@@ -37,7 +37,7 @@ module RISCV_TOP (
 	wire [11:0] TEMP;
 	wire [10:0] ALU_CONTROL;
 	wire [6:0] OPCODE, FUNCT7;
-	wire [4:0] OP;
+	wire [3:0] OP;
 	wire [2:0] FUNCT3;
 	wire [1:0] MUX2, MUX4;
 
