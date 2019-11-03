@@ -108,7 +108,7 @@ module CONTROL (
 			endcase
 		end
 
-		4'b0011: begin //STATE 3
+		4'b0011: begin //STATE 3 - JAL EX
 			MUX1 <= 0;
 			MUX2 <= 2'b10;
 			MUX4 <= 0;
@@ -124,7 +124,7 @@ module CONTROL (
 			D_MEM_CSN <= ~RSTn;
 		end
 		
-		4'b0100: begin //STATE 4
+		4'b0100: begin //STATE 4 - BR ID
 			MUX1 <= 0;
 			MUX2 <= 2'b10;
 			ALU_WR <= 1;
@@ -139,7 +139,7 @@ module CONTROL (
 			D_MEM_CSN <= ~RSTn;
 		end
 
-		4'b0101: begin //STATE 5: LW EX
+		4'b0101: begin //STATE 5: LW EX + I EX
 			MUX1 <= 1;
 			MUX2 <= 2'b10;
 			ALU_WR <= 1;
@@ -153,9 +153,9 @@ module CONTROL (
 			D_MEM_CSN <= ~RSTn;
 			
 			case (OPCODE)
-			7'b0010011:
+			7'b0010011: //11 - I WB
 				NXT_STATE_REG <= 4'b1011;
-			7'b0000011:
+			7'b0000011: //12 - LW MEM
 				NXT_STATE_REG <= 4'b1100;
 			endcase
 		end
@@ -170,6 +170,7 @@ module CONTROL (
 			PC_WRITE_COND <= 0;
 			IR_WR <= 0;
 			D_MEM_WEN <= 1;
+			D_MEM_BE <= 4'b1111;
 			NXT_STATE_REG <= 4'b1110;
 			I_MEM_CSN <= ~RSTn;
 			D_MEM_CSN <= ~RSTn;
@@ -237,7 +238,7 @@ module CONTROL (
 		end
 
 	
-		4'b1011: begin //STATE11
+		4'b1011: begin //STATE11 - JAL WB + I WB + R WB
 			ALU_WR <= 0;
 			PC_WR <= 0;
 			RF_WE <= 1;

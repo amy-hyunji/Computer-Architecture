@@ -14,8 +14,8 @@ module ALUCONTROL (
 	assign CONTROLOUT = _CONTROLOUT;
 
 	initial begin
-		OP = 0;
-		STATE = 0;
+		OP = ALU_CONTROL[10:4];
+		STATE = ALU_CONTROL[3:0];
 		_CONTROLOUT = 0;
 	end
 
