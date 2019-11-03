@@ -7,7 +7,8 @@ module CONTROL (
 	output wire [3:0] _D_MEM_BE,
 	output wire _MUX1, _MUX4, _ALU_WR, _PC_WR, _RF_WE, _PC_WRITE_COND, _IR_WR, _D_MEM_WEN, _REWR_MUX, _I_MEM_CSN, _D_MEM_CSN,  
 	output wire [1:0] _MUX2, 
-	output wire [10:0] _ALU_CONTROL
+	output wire [10:0] _ALU_CONTROL,
+    output wire [31:0] NUM_INST
 	);
 
 	assign I_MEM_CSN = ~RSTn;
@@ -20,6 +21,7 @@ module CONTROL (
 	reg MUX1, MUX4, ALU_WR, PC_WR, RF_WE, PC_WRITE_COND, IR_WR, D_MEM_WEN, REWR_MUX, D_MEM_BE;
 	reg [1:0] MUX2;
 	reg [10:0] ALU_CONTROL;
+    reg [31:0] _NUMINST;
 
 	assign CUR_STATE = CUR_STATE_REG;
 	assign NXT_STATE = NXT_STATE_REG;
@@ -35,23 +37,29 @@ module CONTROL (
 	assign _REWR_MUX = REWR_MUX;
 	assign _D_MEM_BE = D_MEM_BE;
 	assign _ALU_CONTROL = ALU_CONTROL;
+    assign NUM_INST = _NUMINST; 
 
 	initial begin
-		CUR_STATE_REG = 1;
-		NXT_STATE_REG = 1;
-		MUX1 = 0;
-		MUX2 = 0;
-		MUX4 = 0;
-		ALU_WR = 0; 
-		PC_WR = 0;
-		RF_WE = 0;
-		PC_WRITE_COND = 0;
-		IR_WR = 0;
-		D_MEM_WEN = 0;
-		REWR_MUX = 0;
-		D_MEM_BE = 0;
-		ALU_CONTROL = 0;
+        _NUMINST <= 0;
+		CUR_STATE_REG <= 1;
+		NXT_STATE_REG <= 1;
+		MUX1 <= 0;
+		MUX2 <= 0;
+		MUX4 <= 0;
+		ALU_WR <= 0; 
+		PC_WR <= 0;
+		RF_WE <= 0;
+		PC_WRITE_COND <= 0;
+		IR_WR <= 0;
+		D_MEM_WEN <= 0;
+		REWR_MUX <= 0;
+		D_MEM_BE <= 0;
+		ALU_CONTROL <= 0;
 	end
+
+    always@ (negedge CLK) begin
+        if (RSTn & CUR_STATE_REG == 1) _NUMINST = _NUMINST + 1;
+    end
 
 	always@ (posedge CLK) begin
 		CUR_STATE_REG = NXT_STATE;

@@ -32,14 +32,6 @@ module RISCV_TOP (
 	// TODO: implement multi-cycle CPU
 	assign OUTPUT_PORT = RF_WD;
 
-	initial begin
-		NUM_INST <= 0;
-	end
-
-	always @ (negedge CLK) begin
-		if (RSTn) NUM_INST <= NUM_INST + 1;
-	end
-
 	wire ZERO, MUX1, MUX4, ALU_WR, PC_WR, PC_WRITE_COND, IR_WR, REWR_MUX;
 	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT;
 	wire [11:0] TEMP;
@@ -84,7 +76,8 @@ module RISCV_TOP (
 			._D_MEM_CSN(D_MEM_CSN),
 			._D_MEM_BE(D_MEM_BE),
 			._MUX2(MUX2),
-			._ALU_CONTROL(ALU_CONTROL)
+			._ALU_CONTROL(ALU_CONTROL),
+            .NUM_INST(NUM_INST)
 			);
 
 	HALT halt (
