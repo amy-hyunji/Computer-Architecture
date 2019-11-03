@@ -23,7 +23,7 @@ module ALU (
 				//add
             5'b00000: begin
 					Kout = A + B;
-					$display("A: %b, B: %b, ALU OUTPUT: %b", A, B, Kout);
+					//$display("A: %b, B: %b, ALU OUTPUT: %b", A, B, Kout);
 				end
 
 				//sub

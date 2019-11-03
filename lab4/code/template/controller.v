@@ -39,7 +39,7 @@ module CONTROL (
 	assign _I_MEM_CSN = I_MEM_CSN;
 
 	initial begin
-        _NUMINST <= 0;
+        _NUMINST <= -1;
 		CUR_STATE_REG <= 1;
 		NXT_STATE_REG <= 1;
 		MUX1 <= 0;
@@ -58,8 +58,7 @@ module CONTROL (
 	end
 
     always@ (negedge CLK) begin
-        if (RSTn & CUR_STATE_REG == 1) _NUMINST <= _NUMINST + 1;
-			//$display("NUM_INST : %s", _NUMINST);
+        if (RSTn & NXT_STATE_REG == 1) _NUMINST <= _NUMINST + 1;
     end
 
 	always@ (posedge CLK) begin
