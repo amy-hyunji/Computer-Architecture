@@ -147,7 +147,6 @@ module CONTROL (
 		7'b0100011: //SW
 			NXT_STATE_REG <= 4'b0100;
 		7'b0000011: begin //LD
-			$display("LWLWLWLW");
 			NXT_STATE_REG <= 4'b1100;
 		end
 		7'b0010011: //I_TYPE
@@ -179,7 +178,7 @@ module CONTROL (
 
 		4'b1000: begin
 		MUX1 <= 2'b00;
-		MUX2 <= 2'b00;
+		MUX2 <= 2'b11;
 		MUX4 <= 2'b01;
 		PC_WR <= 1;
 		ALU_CONTROL <= {OPCODE, CUR_STATE};
@@ -192,7 +191,7 @@ module CONTROL (
 
 		4'b1001: begin
 		MUX1 <= 2'b01;
-		MUX2 <= 2'b11;
+		MUX2 <= 2'b01;
 		MUX4 <= 2'b10;
 		PC_WR <= 0;
 		ALU_CONTROL <= {OPCODE, CUR_STATE};

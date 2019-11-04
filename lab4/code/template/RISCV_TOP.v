@@ -53,17 +53,17 @@ module RISCV_TOP (
 	always@ (posedge CLK) begin
 			NUM_INST <= _NUM_INST;
 			
-			if (RSTn) begin
-            $display("NUM_INST : %d, INSTRUCTION: %h, OPCODE: %b", NUM_INST, I_MEM_DI, OPCODE);
-            $display("%d: MUX1_OUT : %d", MUX1, MUX1_OUT);
-            $display("%d: MUX2_OUT : %d", MUX2, MUX2_OUT);
-            $display("IR_WR: %b, PC_WR: %b, PC_OUT: %d, I_MEM_ADDR: %d", IR_WR, ((ZERO & PC_WRITE_COND) | PC_WR), PC_OUT, I_MEM_ADDR);
-				$display("ALUOUT_D : %d, ALU_D: %d", ALUOUT_D, ALU_D);
-				$display("D_MEM_DOUT: %b", D_MEM_DOUT);
-				$display("D_MEM_WEN: %b, D_MEM_ADDR: %d", D_MEM_WEN, D_MEM_ADDR);
-				$display("RF_RA1: %d, RF_RA2: %d, RF_WA: %d ", RF_RA1, RF_RA2, RF_WA1);	
-				$display("--------------------");
-        end
+			//if (RSTn) begin
+         //   $display("NUM_INST : %d, INSTRUCTION: %h, OPCODE: %b", NUM_INST, I_MEM_DI, OPCODE);
+         //   $display("%d: MUX1_OUT : %d", MUX1, MUX1_OUT);
+         //   $display("%d: MUX2_OUT : %d", MUX2, MUX2_OUT);
+         //   $display("IR_WR: %b, PC_WR: %b, PC_OUT: %d, I_MEM_ADDR: %d", IR_WR, ((ZERO & PC_WRITE_COND) | PC_WR), PC_OUT, I_MEM_ADDR);
+			//	$display("ALUOUT_D : %d, ALU_D: %d", ALUOUT_D, ALU_D);
+			//	$display("D_MEM_DOUT: %b", D_MEM_DOUT);
+			//	$display("D_MEM_WEN: %b, D_MEM_ADDR: %d", D_MEM_WEN, D_MEM_ADDR);
+			//	$display("RF_RA1: %d, RF_RA2: %d, RF_WA: %d ", RF_RA1, RF_RA2, RF_WA1);	
+			//	$display("--------------------");
+  // end
 		  
 
 	end
@@ -165,7 +165,7 @@ module RISCV_TOP (
 
 	TWOBITMUX mux2(
 			.SIGNAL(MUX2),
-			.INPUT1(4),
+			.INPUT1(32'b00000000000000000000000000000100),
 			.INPUT2(B_OUT),
 			.INPUT3(IMMEDIATE),
 			.INPUT4(0),

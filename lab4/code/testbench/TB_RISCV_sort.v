@@ -186,6 +186,8 @@ module TB_RISCV ();
 				end
 			end
 
+			$display("NEED DHAKLREKNLR");
+
 			if (HALT == 1) begin
 				$display("Finish: %d cycle", cycle);
 				$display("Success.");
