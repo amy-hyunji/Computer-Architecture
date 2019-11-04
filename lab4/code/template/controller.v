@@ -121,7 +121,7 @@ module CONTROL (
 
 		4'b0011: begin
 		MUX1 <= 0;
-		MUX2 <= 2'b00;
+		MUX2 <= 2'b11;
 		MUX4 <= 2'b10;
 		PC_WR <= 1;
 		ALU_CONTROL <= {OPCODE, CUR_STATE};
@@ -200,7 +200,7 @@ module CONTROL (
 
 		4'b1001: begin
 		MUX1 <= 1;
-		MUX2 <= 2'b01;
+		MUX2 <= 2'b11;
 		MUX4 <= 2'b10;
 		PC_WR <= 0;
 		ALU_CONTROL <= {OPCODE, CUR_STATE};

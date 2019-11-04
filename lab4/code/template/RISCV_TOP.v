@@ -43,11 +43,9 @@ module RISCV_TOP (
 	initial I_MEM_ADDR = 0;
 	assign D_MEM_DOUT = B_OUT;
 
-	// modified part///////
 	always@ (TEMP) begin
 		assign I_MEM_ADDR = TEMP;
 	end
-	///////////////////////
 
 	always@ (posedge CLK) begin
 			NUM_INST <= _NUM_INST;
@@ -55,7 +53,7 @@ module RISCV_TOP (
             $display("NUM_INST : %d, INSTRUCTION: %h, OPCODE: %b", NUM_INST, I_MEM_DI, OPCODE);
             $display("%d: MUX1_OUT : %d", MUX1, MUX1_OUT);
             $display("%d: MUX2_OUT : %d", MUX2, MUX2_OUT);
-            $display("ZERO: %b, PC_WR: %b, PC_OUT: %d, I_MEM_ADDR: %d", ZERO, ((ZERO & PC_WRITE_COND) | PC_WR), PC_OUT, I_MEM_ADDR);
+            $display("IR_WR: %b, PC_WR: %b, PC_OUT: %d, I_MEM_ADDR: %d", IR_WR, ((ZERO & PC_WRITE_COND) | PC_WR), PC_OUT, I_MEM_ADDR);
 				$display("ALUOUT_D : %d, ALU_D: %d", ALUOUT_D, ALU_D);
 				$display("OPCODE: %b", OPCODE);
 				$display("D_MEM_DOUT: %b", D_MEM_DOUT);
