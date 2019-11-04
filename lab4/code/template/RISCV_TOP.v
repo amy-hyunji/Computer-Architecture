@@ -43,9 +43,11 @@ module RISCV_TOP (
 	initial I_MEM_ADDR = 0;
 	assign D_MEM_DOUT = B_OUT;
 
+	// modified part///////
 	always@ (TEMP) begin
 		assign I_MEM_ADDR = TEMP;
 	end
+	///////////////////////
 
 	always@ (posedge CLK) begin
 			NUM_INST <= _NUM_INST;
