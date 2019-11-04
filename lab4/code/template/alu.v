@@ -60,31 +60,37 @@ module ALU (
             //beq
             4'b1010: begin
                 if (A == B) _ZERO = 1;
-            end
+					 else _ZERO = 0;
+				end
 
             //bne
             4'b1011: begin
                 if (A != B) _ZERO = 1;
+					 else _ZERO = 0;
             end
 
             //blt
             4'b1100: begin
                 if ($signed(A) < $signed(B)) _ZERO = 1;
+					 else _ZERO = 0;
             end
 
             //bge
             4'b1101: begin
                 if ($signed(A) >= $signed(B)) _ZERO = 1;
-            end
+					 else _ZERO = 0;
+				end
 
             //bltu
             4'b1110: begin
                 if (A < B) _ZERO = 1;
+					 else _ZERO = 0;
             end
 
             //bgeu
             4'b1111: begin
                 if(A >= B) _ZERO = 1;
+					 else _ZERO = 0;
             end
 
             default: Kout = 0;

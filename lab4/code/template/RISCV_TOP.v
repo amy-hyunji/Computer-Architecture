@@ -30,7 +30,6 @@ module RISCV_TOP (
 	);
 
 	// TODO: implement multi-cycle CPU
-	assign OUTPUT_PORT = RF_WD;
 
 	wire ZERO, MUX1, PC_WR, PC_WRITE_COND, IR_WR, REWR_MUX;
 	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT, _NUM_INST, JALR_D, JALROUT_D;
@@ -41,21 +40,27 @@ module RISCV_TOP (
 	wire [2:0] FUNCT3;
 	wire [1:0] MUX2, MUX4;
 
-	assign D_MEM_DOUT = B_OUT; 
+	initial I_MEM_ADDR = 0;
+	assign D_MEM_DOUT = B_OUT;
+
+	always@ (TEMP) begin
+		assign I_MEM_ADDR = TEMP;
+	end
 
 	always@ (posedge CLK) begin
-		I_MEM_ADDR <= TEMP;
-        NUM_INST <= _NUM_INST;
-        if (RSTn) begin
-            $display("NUM_INST : %d", NUM_INST);
-            $display("REWR_MUX : %d", REWR_MUX);
-            $display("MUX1_OUT : %d", MUX1_OUT);
-            $display("MUX2_OUT : %d", MUX2_OUT);
-            $display("MUX2 control sig : %d", MUX2);
-
-            $display("ALUOUT_D : %d", ALUOUT_D);
-            $display("ALU_D : %d", ALU_D);
-            $display("--------------------");
+			NUM_INST <= _NUM_INST;
+			if (RSTn) begin
+            $display("NUM_INST : %d, INSTRUCTION: %h, OPCODE: %b", NUM_INST, I_MEM_DI, OPCODE);
+            $display("%d: MUX1_OUT : %d", MUX1, MUX1_OUT);
+            $display("%d: MUX2_OUT : %d", MUX2, MUX2_OUT);
+            $display("ZERO: %b, PC_WR: %b, PC_OUT: %d, I_MEM_ADDR: %d", ZERO, ((ZERO & PC_WRITE_COND) | PC_WR), PC_OUT, I_MEM_ADDR);
+				$display("ALUOUT_D : %d, ALU_D: %d", ALUOUT_D, ALU_D);
+				$display("OPCODE: %b", OPCODE);
+				$display("D_MEM_DOUT: %b", D_MEM_DOUT);
+				//$display("D_MEM_DI: %b", D_MEM_DI);
+				$display("D_MEM_WEN: %b, D_MEM_BE: %b, D_MEM_ADDR: %d", D_MEM_WEN, D_MEM_BE, D_MEM_ADDR);
+				$display("RF_RA1: %d, RF_RA2: %d, RF_WA: %d ", RF_RA1, RF_RA2, RF_WA1);	
+				$display("--------------------");
         end
 
 	end
@@ -181,4 +186,11 @@ module RISCV_TOP (
 		.FUNCT7(FUNCT7),
 		.CONTROLOUT(OP));
 	
+	OUTPUTPORT outputport (
+		.REGWRVAL(RF_WD),
+		.ZERO(ZERO),
+		.DMEMADDR(D_MEM_ADDR),
+		.OPCODE(OPCODE),
+		.OUTPUT(OUTPUT_PORT));
+
 endmodule //

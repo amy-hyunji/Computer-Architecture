@@ -15,7 +15,8 @@ module CONTROL (
 	wire [3:0] NXT_STATE;
 	reg[3:0] CUR_STATE_REG;
 	reg[3:0] NXT_STATE_REG;
-	reg MUX1, PC_WR, RF_WE, PC_WRITE_COND, IR_WR, D_MEM_WEN, REWR_MUX, D_MEM_BE;
+	reg[3:0] D_MEM_BE;
+	reg MUX1, PC_WR, RF_WE, PC_WRITE_COND, IR_WR, D_MEM_WEN, REWR_MUX;
 	reg [1:0] MUX4, MUX2;
 	reg [10:0] ALU_CONTROL;
    reg [31:0] _NUMINST;
@@ -62,12 +63,14 @@ module CONTROL (
 
 	always@ (posedge CLK) begin
 		CUR_STATE_REG = NXT_STATE;
-        if (RSTn) begin
-            $display("=======");
-            $display("CUR_STATE : %d", CUR_STATE);
-            $display("=======");
+        //if (RSTn) begin
+         //   $display("=======");
+          //  $display("CUR_STATE : %d", CUR_STATE);
+           // $display("OPCODE : %b", OPCODE);
+            //$display("NUMINST : %d", _NUMINST);
+            //$display("=======");
 
-        end
+        //end
 	end
 
 	always@ (*) begin
@@ -151,8 +154,10 @@ module CONTROL (
 		case (OPCODE)
 		7'b0100011: //SW
 			NXT_STATE_REG <= 4'b0100;
-		7'b0000011: //LD
+		7'b0000011: begin //LD
+			$display("LWLWLWLW");
 			NXT_STATE_REG <= 4'b1100;
+		end
 		7'b0010011: //I_TYPE
 			NXT_STATE_REG <= 4'b1011;
 		endcase
