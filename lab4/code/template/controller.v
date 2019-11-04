@@ -63,14 +63,6 @@ module CONTROL (
 
 	always@ (posedge CLK) begin
 		CUR_STATE_REG = NXT_STATE;
-        //if (RSTn) begin
-         //   $display("=======");
-          //  $display("CUR_STATE : %d", CUR_STATE);
-           // $display("OPCODE : %b", OPCODE);
-            //$display("NUMINST : %d", _NUMINST);
-            //$display("=======");
-
-        //end
 	end
 
 	always@ (*) begin

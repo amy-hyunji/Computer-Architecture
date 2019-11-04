@@ -5,11 +5,12 @@ module ALUCONTROL (
 		input wire [6:0] FUNCT7,
 
 		output wire [3:0] CONTROLOUT
+		
 		);
 
 	reg [6:0] OP;
 	reg [3:0] STATE;
-	reg [4:0] _CONTROLOUT;
+	reg [3:0] _CONTROLOUT;
 
 	assign CONTROLOUT = _CONTROLOUT;
 
@@ -19,7 +20,7 @@ module ALUCONTROL (
 		_CONTROLOUT = 0;
 	end
 
-	always@ (*) begin
+	always@ (ALU_CONTROL) begin
 		
 		OP = ALU_CONTROL[10:4];
 		STATE = ALU_CONTROL[3:0];
@@ -68,9 +69,8 @@ module ALUCONTROL (
 		end
 		else if (STATE == 4'b0101 & OP == 7'b0010011) begin // I-type EX
 			case (FUNCT3)
-			3'b000: begin//addi
+			3'b000: //addi
 				_CONTROLOUT = 4'b0000;
-			end	
 			3'b010: //slti
 				_CONTROLOUT = 4'b0011;
 			3'b011: //sltiu
