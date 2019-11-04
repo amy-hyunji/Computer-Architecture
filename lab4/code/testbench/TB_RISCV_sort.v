@@ -176,6 +176,7 @@ module TB_RISCV ();
 				if ((NUM_INST==TestNumInst[i]) & (TestPassed[i]==0)) begin
 					if (OUTPUT_PORT == TestAns[i]) begin
 						TestPassed[i] <= 1'b1;
+						$display("Test #%s success!", TestID[i]);
 					end
 					else begin
 						TestPassed[i] <= 1'b0;
@@ -185,8 +186,6 @@ module TB_RISCV ();
 					end
 				end
 			end
-
-			$display("NEED DHAKLREKNLR");
 
 			if (HALT == 1) begin
 				$display("Finish: %d cycle", cycle);

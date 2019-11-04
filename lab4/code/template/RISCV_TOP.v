@@ -32,7 +32,7 @@ module RISCV_TOP (
 	// TODO: implement multi-cycle CPU
 
 	wire ZERO, PC_WR, PC_WRITE_COND, IR_WR, REWR_MUX;
-	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT, _NUM_INST, JALR_D, JALROUT_D;
+	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT, JALR_D, JALROUT_D, CUR_INST, _NUM_INST;
 	wire [11:0] TEMP;
 	wire [10:0] ALU_CONTROL;
 	wire [6:0] OPCODE, FUNCT7;
@@ -50,22 +50,23 @@ module RISCV_TOP (
 		assign I_MEM_ADDR = TEMP;
 	end
 
-	always@ (posedge CLK) begin
-			NUM_INST <= _NUM_INST;
-			
-			//if (RSTn) begin
-         //   $display("NUM_INST : %d, INSTRUCTION: %h, OPCODE: %b", NUM_INST, I_MEM_DI, OPCODE);
-         //   $display("%d: MUX1_OUT : %d", MUX1, MUX1_OUT);
-         //   $display("%d: MUX2_OUT : %d", MUX2, MUX2_OUT);
-         //   $display("IR_WR: %b, PC_WR: %b, PC_OUT: %d, I_MEM_ADDR: %d", IR_WR, ((ZERO & PC_WRITE_COND) | PC_WR), PC_OUT, I_MEM_ADDR);
-			//	$display("ALUOUT_D : %d, ALU_D: %d", ALUOUT_D, ALU_D);
-			//	$display("D_MEM_DOUT: %b", D_MEM_DOUT);
-			//	$display("D_MEM_WEN: %b, D_MEM_ADDR: %d", D_MEM_WEN, D_MEM_ADDR);
-			//	$display("RF_RA1: %d, RF_RA2: %d, RF_WA: %d ", RF_RA1, RF_RA2, RF_WA1);	
-			//	$display("--------------------");
-  // end
-		  
+	always@ (_NUM_INST) begin
+		NUM_INST = _NUM_INST;
+	end
 
+	always@ (posedge CLK) begin
+			
+			if (RSTn) begin
+				/*
+            $display("NUM_INST : %d, INSTRUCTION: %h, OPCODE: %b", NUM_INST, I_MEM_DI, OPCODE);
+            $display("%d: MUX1_OUT : %d", MUX1, MUX1_OUT);
+            $display("%d: MUX2_OUT : %d", MUX2, MUX2_OUT);
+            $display("IR_WR: %b, PC_WR: %b, PC_OUT: %d, PC_IN: %d, I_MEM_ADDR: %d", IR_WR, ((ZERO & PC_WRITE_COND) | PC_WR), PC_OUT, PC_IN, I_MEM_ADDR);
+				$display("ALUOUT_D : %d, ALU_D: %d", ALUOUT_D, ALU_D);
+				$display("RF_RA1: %d, RF_RA2: %d, RF_WA: %d ", RF_RA1, RF_RA2, RF_WA1);	
+				$display("--------------------");
+				*/
+			end
 	end
 
 	INSTREG instreg (
@@ -78,7 +79,8 @@ module RISCV_TOP (
 			.RS2(RF_RA2),
 			.FUNCT3(FUNCT3),
 			.FUNCT7(FUNCT7),
-			.RD(RF_WA1));
+			.RD(RF_WA1),
+			.CUR_INST(CUR_INST));
 	
 
 	CONTROL control (
@@ -98,11 +100,11 @@ module RISCV_TOP (
 			._D_MEM_BE(D_MEM_BE),
 			._MUX2(MUX2),
 			._ALU_CONTROL(ALU_CONTROL),
-            .NUM_INST(_NUM_INST)
+			.NUM_INST(_NUM_INST)
 			);
 
 	HALT halt (
-		._Instruction(I_MEM_DI),
+		.CUR_INST(CUR_INST),
 		._RF_RD1(RF_RD1),
 		._halt(HALT));
 
@@ -143,10 +145,10 @@ module RISCV_TOP (
 
 	TWOBITMUX mux1 (
 			.SIGNAL(MUX1),
-			.INPUT1(PC_OUT),
-			.INPUT2(A_OUT),
-			.INPUT3(ALUOUT_D),
-			.INPUT4(0),
+			.INPUT1(PC_OUT), //00
+			.INPUT2(A_OUT),  //01
+			.INPUT3(ALUOUT_D), //10
+			.INPUT4(0), //11
 			.OUTPUT(MUX1_OUT));
 
 	TWOBITMUX mux4 (

@@ -10,7 +10,8 @@ module INSTREG(
 		output [4:0] RS2,
 		output [2:0] FUNCT3,
 		output [6:0] FUNCT7,
-		output [4:0] RD
+		output [4:0] RD,
+		output [31:0] CUR_INST
 
 		);
 
@@ -23,6 +24,7 @@ module INSTREG(
 		reg[6:0] _FUNCT7;
 		reg[4:0] _RD;
 
+		assign CUR_INST = TEMP_INST;
 		assign OPCODE = _OPCODE;
 		assign IMMEDIATE = _IMMEDIATE;
 		assign RS1 = _RS1;
