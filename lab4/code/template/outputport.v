@@ -5,6 +5,7 @@ module OUTPUTPORT(
 		input wire [11:0] DMEMADDR,
 		input wire [6:0] OPCODE,
 
+
 		output wire[31:0] OUTPUT
 
 		);
@@ -26,6 +27,7 @@ module OUTPUTPORT(
 			default: begin 
 				_OUTPUT = REGWRVAL;	
 			end
+				
 			endcase
 
 		end

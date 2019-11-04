@@ -31,14 +31,14 @@ module RISCV_TOP (
 
 	// TODO: implement multi-cycle CPU
 
-	wire ZERO, MUX1, PC_WR, PC_WRITE_COND, IR_WR, REWR_MUX;
+	wire ZERO, PC_WR, PC_WRITE_COND, IR_WR, REWR_MUX;
 	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT, _NUM_INST, JALR_D, JALROUT_D;
 	wire [11:0] TEMP;
 	wire [10:0] ALU_CONTROL;
 	wire [6:0] OPCODE, FUNCT7;
 	wire [3:0] OP;
 	wire [2:0] FUNCT3;
-	wire [1:0] MUX2, MUX4;
+	wire [1:0] MUX1, MUX2, MUX4;
 
 	initial begin
 		I_MEM_ADDR = 0;
@@ -52,6 +52,7 @@ module RISCV_TOP (
 
 	always@ (posedge CLK) begin
 			NUM_INST <= _NUM_INST;
+			
 			if (RSTn) begin
             $display("NUM_INST : %d, INSTRUCTION: %h, OPCODE: %b", NUM_INST, I_MEM_DI, OPCODE);
             $display("%d: MUX1_OUT : %d", MUX1, MUX1_OUT);
@@ -63,6 +64,7 @@ module RISCV_TOP (
 				$display("RF_RA1: %d, RF_RA2: %d, RF_WA: %d ", RF_RA1, RF_RA2, RF_WA1);	
 				$display("--------------------");
         end
+		  
 
 	end
 
@@ -139,10 +141,12 @@ module RISCV_TOP (
 		.E_ADDR(ALUOUT_D),
 		.T_ADDR(D_MEM_ADDR));
 
-	ONEBITMUX mux1 (
+	TWOBITMUX mux1 (
 			.SIGNAL(MUX1),
 			.INPUT1(PC_OUT),
 			.INPUT2(A_OUT),
+			.INPUT3(ALUOUT_D),
+			.INPUT4(0),
 			.OUTPUT(MUX1_OUT));
 
 	TWOBITMUX mux4 (

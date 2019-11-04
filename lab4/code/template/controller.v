@@ -5,8 +5,8 @@ module CONTROL (
 	input wire CLK,
 
 	output wire [3:0] _D_MEM_BE,
-	output wire _MUX1, _PC_WR, _RF_WE, _PC_WRITE_COND, _IR_WR, _D_MEM_WEN, _REWR_MUX, _I_MEM_CSN, _D_MEM_CSN,  
-	output wire [1:0] _MUX2, _MUX4, 
+	output wire _PC_WR, _RF_WE, _PC_WRITE_COND, _IR_WR, _D_MEM_WEN, _REWR_MUX, _I_MEM_CSN, _D_MEM_CSN,  
+	output wire [1:0] _MUX1, _MUX2, _MUX4, 
 	output wire [10:0] _ALU_CONTROL,
    output wire [31:0] NUM_INST
 	);
@@ -16,8 +16,8 @@ module CONTROL (
 	reg[3:0] CUR_STATE_REG;
 	reg[3:0] NXT_STATE_REG;
 	reg[3:0] D_MEM_BE;
-	reg MUX1, PC_WR, RF_WE, PC_WRITE_COND, IR_WR, D_MEM_WEN, REWR_MUX;
-	reg [1:0] MUX4, MUX2;
+	reg PC_WR, RF_WE, PC_WRITE_COND, IR_WR, D_MEM_WEN, REWR_MUX;
+	reg [1:0] MUX4, MUX2, MUX1;
 	reg [10:0] ALU_CONTROL;
    reg [31:0] _NUMINST;
 
@@ -69,7 +69,7 @@ module CONTROL (
 		case (CUR_STATE)
 		
 		4'b0001: begin //stage1
-		MUX1 <= 0;
+		MUX1 <= 2'b00;
 		MUX2 <= 2'b00;
 		PC_WR <= 0;
 		ALU_CONTROL <= {OPCODE, CUR_STATE};
@@ -82,7 +82,7 @@ module CONTROL (
 		end
 
 		4'b0010: begin
-		MUX1 <= 0;
+		MUX1 <= 2'b00;
 		MUX2 <= 2'b10;
 		MUX4 <= 2'b10;
 		PC_WR <= 1;
@@ -112,7 +112,7 @@ module CONTROL (
 		end
 
 		4'b0011: begin
-		MUX1 <= 0;
+		MUX1 <= 2'b00;
 		MUX2 <= 2'b11;
 		MUX4 <= 2'b10;
 		PC_WR <= 1;
@@ -135,7 +135,7 @@ module CONTROL (
 		end
 
 		4'b0101: begin
-		MUX1 <= 1;
+		MUX1 <= 2'b01;
 		MUX2 <= 2'b10;
 		PC_WR <= 0;
 		ALU_CONTROL <= {OPCODE, CUR_STATE};
@@ -166,7 +166,7 @@ module CONTROL (
 		end
 
 		4'b0111: begin
-		MUX1 <= 1;
+		MUX1 <= 2'b01;
 		MUX2 <= 2'b01;
 		PC_WR <= 0;
 		ALU_CONTROL <= {OPCODE, CUR_STATE};
@@ -178,7 +178,7 @@ module CONTROL (
 		end
 
 		4'b1000: begin
-		MUX1 <= 0;
+		MUX1 <= 2'b00;
 		MUX2 <= 2'b00;
 		MUX4 <= 2'b01;
 		PC_WR <= 1;
@@ -191,7 +191,7 @@ module CONTROL (
 		end
 
 		4'b1001: begin
-		MUX1 <= 1;
+		MUX1 <= 2'b01;
 		MUX2 <= 2'b11;
 		MUX4 <= 2'b10;
 		PC_WR <= 0;
@@ -204,7 +204,7 @@ module CONTROL (
 		end
 
 		4'b1010: begin
-		MUX1 <= 0;
+		MUX1 <= 2'b00;
 		MUX2 <= 2'b00;
 		PC_WR <= 0;
 		RF_WE <= 0;
@@ -215,6 +215,8 @@ module CONTROL (
 		end
 
 		4'b1011: begin
+		MUX1 <= 2'b10;
+		MUX2 <= 2'b11;
 		PC_WR <= 0;
 		RF_WE <= 1;
 		PC_WRITE_COND <= 0;
