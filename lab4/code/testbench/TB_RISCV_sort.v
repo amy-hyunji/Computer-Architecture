@@ -112,10 +112,6 @@ module TB_RISCV ();
 	reg verify;
 
 	initial begin
-
-		$dumpfile("test.vcd");
-		$dumpvars(0, TB_RISCV);
-
 		cycle <= 0;
 		#10000000 $finish();
 	end
