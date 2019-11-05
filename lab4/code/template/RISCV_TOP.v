@@ -57,9 +57,10 @@ module RISCV_TOP (
 	always@ (posedge CLK) begin
 			
 			if (RSTn) begin
-				/*
-            $display("NUM_INST : %d, INSTRUCTION: %h, OPCODE: %b", NUM_INST, I_MEM_DI, OPCODE);
-            $display("%d: MUX1_OUT : %d", MUX1, MUX1_OUT);
+				
+            //$display("NUM_INST : %d, INSTRUCTION: %h, OPCODE: %b", NUM_INST, I_MEM_DI, OPCODE);
+           /*
+				$display("%d: MUX1_OUT : %d", MUX1, MUX1_OUT);
             $display("%d: MUX2_OUT : %d", MUX2, MUX2_OUT);
             $display("IR_WR: %b, PC_WR: %b, PC_OUT: %d, PC_IN: %d, I_MEM_ADDR: %d", IR_WR, ((ZERO & PC_WRITE_COND) | PC_WR), PC_OUT, PC_IN, I_MEM_ADDR);
 				$display("ALUOUT_D : %d, ALU_D: %d", ALUOUT_D, ALU_D);
@@ -105,7 +106,7 @@ module RISCV_TOP (
 
 	HALT halt (
 		.CUR_INST(CUR_INST),
-		._RF_RD1(RF_RD1),
+		.A_OUT(A_OUT),
 		._halt(HALT));
 
 	CONTROLREG pc (
