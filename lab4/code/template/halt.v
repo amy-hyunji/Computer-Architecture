@@ -1,7 +1,7 @@
 module HALT(
 
 	input [31:0] CUR_INST,
-	input [31:0] A_OUT,
+	input [31:0] NXT_INST,
 
 	output _halt
 
@@ -11,8 +11,8 @@ module HALT(
 	assign _halt = reg_halt;
 	initial reg_halt = 0;
 
-	always@ (CUR_INST) begin
-		if ((CUR_INST == 32'h00008067)) reg_halt = 1;
+	always@ (*) begin
+		if ((NXT_INST == 32'h00008067) & (CUR_INST == 32'h00c00093)) reg_halt = 1;
 		else reg_halt = 0;
 	end
 

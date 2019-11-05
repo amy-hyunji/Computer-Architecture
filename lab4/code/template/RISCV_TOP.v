@@ -32,7 +32,7 @@ module RISCV_TOP (
 	// TODO: implement multi-cycle CPU
 
 	wire ZERO, PC_WR, PC_WRITE_COND, IR_WR, REWR_MUX;
-	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT, JALR_D, JALROUT_D, CUR_INST, _NUM_INST;
+	wire [31:0] IMMEDIATE, PC_IN, PC_OUT, A_OUT, B_OUT, MUX1_OUT, ALU_D, ALUOUT_D, MUX2_OUT, JALR_D, CUR_INST, _NUM_INST;
 	wire [11:0] TEMP;
 	wire [10:0] ALU_CONTROL;
 	wire [6:0] OPCODE, FUNCT7;
@@ -106,7 +106,7 @@ module RISCV_TOP (
 
 	HALT halt (
 		.CUR_INST(CUR_INST),
-		.A_OUT(A_OUT),
+		.NXT_INST(I_MEM_DI),
 		._halt(HALT));
 
 	CONTROLREG pc (
@@ -131,11 +131,6 @@ module RISCV_TOP (
 			.IN_VAL(RF_RD2),
 			.OUT_VAL(B_OUT));
 
-	REG jalrreg(
-			.CLK(CLK),
-			.IN_VAL(JALR_D),
-			.OUT_VAL(JALROUT_D));
-
 	TRANSLATE i_translate (
 		.E_ADDR(PC_OUT),
 		.T_ADDR(TEMP));
@@ -155,7 +150,7 @@ module RISCV_TOP (
 	TWOBITMUX mux4 (
 			.SIGNAL(MUX4),
 			.INPUT1(ALU_D),
-			.INPUT2(JALROUT_D),
+			.INPUT2(JALR_D),
 			.INPUT3(ALUOUT_D),
 			.INPUT4(0),
 			.OUTPUT(PC_IN));

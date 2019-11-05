@@ -12,7 +12,7 @@ module ISJALR(
 		assign JALR_OUT = _JALR_OUT;
 
 		always@ (*) begin
-			_JALR_OUT = (A+IMM) & 32'hfffffffe;
+			_JALR_OUT = ((A+IMM) & 32'hfffffffe);
 		end
 
 endmodule
