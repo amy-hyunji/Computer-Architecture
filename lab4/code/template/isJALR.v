@@ -7,7 +7,7 @@ module ISJALR(
 
 		);
 
-		reg _JALR_OUT;
+		reg[31:0] _JALR_OUT;
 		initial _JALR_OUT = 0;
 		assign JALR_OUT = _JALR_OUT;
 

@@ -220,6 +220,7 @@ module CONTROL (
 		RF_WE <= 1;
 		PC_WRITE_COND <= 0;
 		IR_WR <= 0;
+		ALU_CONTROL <= {OPCODE, CUR_STATE};
 		D_MEM_WEN <= 1;
 		REWR_MUX <= 0;
 		NXT_STATE_REG <= 4'b0001;

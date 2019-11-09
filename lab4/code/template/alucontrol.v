@@ -33,6 +33,8 @@ module ALUCONTROL (
 			_CONTROLOUT = 4'b0000;
 		else if (STATE == 4'b1000) // STAGE8
 			_CONTROLOUT = 4'b0000;
+		else if (STATE == 4'b1011) // STAGE11
+			_CONTROLOUT = 4'b0000;
 		else if (STATE == 4'b0101 & OP == 7'b0000011) // LW EX
 			_CONTROLOUT = 4'b0000;
 		else if (STATE == 4'b0101 & OP == 7'b0100011) // SW EX
