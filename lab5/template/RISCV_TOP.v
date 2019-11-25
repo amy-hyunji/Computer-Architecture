@@ -42,7 +42,7 @@ module RISCV_TOP (
 
 	// TODO: implement
 
-	wire [31:0] PC_IN, PC_OUT, IMM_IN, IMM_OUT, Be_OUT, ALU_D, BMUX_OUT, CUR_INST, CONDALU_OUT, nPC_IN, ALUOUT_D, MDRw_OUT, Aout_IN, Aout_OUT, WD_IN, PCm_OUT, Ae_OUT, AMUX_OUT, PCr_IN, PCr_OUT, CONDMUX_OUT, PCALU_OUT, nPC_OUT, Ae_IN, Be_IN, PCm_IN, PCm_OUT, BM_IN, MDRw_IN, MDRw_OUT;
+	wire [31:0] PC_IN, PC_OUT, IMM_IN, IMM_OUT, Be_OUT, ALU_D, BMUX_OUT, CUR_INST, CONDALU_OUT, nPC_IN, ALUOUT_D, Aout_IN, Aout_OUT, WD_IN, Ae_OUT, AMUX_OUT, PCr_IN, PCr_OUT, CONDMUX_OUT, PCALU_OUT, nPC_OUT, PCm_IN, PCm_OUT, BM_IN, MDRw_IN, MDRw_OUT;
 	wire [11:0] I_TEMP;
 	wire [6:0] OPCODE, ALUCONTROL_IN, FUNCT7;
 	wire [4:0] PREV_DEST; 
@@ -91,7 +91,7 @@ module RISCV_TOP (
 	);
 
 	ALUCONTROL alucontrol(
-		.ALUCONTROL(ALUCONTROL_IN),
+		.OPCODE(ALUCONTROL_IN),
 		.FUNCT3(FUNCT3),
 		.FUNCT7(FUNCT7),
 		.CONTROLOUT(ALUCONTROL_OUT)
@@ -141,12 +141,12 @@ module RISCV_TOP (
 		.INPUT3(32'b00000000000000000000000000000000),
 		.INPUT4(Be_OUT),
 		.OUTPUT(BMUX_OUT)
-	};
+	);
 
 	ONEBITMUX MCONDMUX(
 		.SIGNAL(CONDMUX),
 		.INPUT1(PCr_OUT),
-		.INPUT2(RF_RA2),
+		.INPUT2(RF_RD2),
 		.OUTPUT(CONDMUX_OUT)
 	);
 
@@ -183,9 +183,9 @@ module RISCV_TOP (
 
 	EQUAL equal(
 		.OP(ALUCONTROL_OUT),
-		.A(Ae_IN),
-		.B(Be_IN),
-		.Out(ZERO)
+		.A(RF_RD1),
+		.B(RF_RD2),
+		.Zero(ZERO)
 	);
 	/////////////////////////////
 
@@ -232,13 +232,13 @@ module RISCV_TOP (
 
 	REG Ae(
 		.CLK(CLK),
-		.IN_VAL(Ae_IN),
+		.IN_VAL(RF_RD1),
 		.OUT_VAL(Ae_OUT)
 	);
 
 	REG Be(
 		.CLK(CLK),
-		.IN_VAL(Be_IN),
+		.IN_VAL(RF_RD2),
 		.OUT_VAL(Be_OUT)
 	);
 	/////////////////////////////

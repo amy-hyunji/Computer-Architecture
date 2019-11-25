@@ -16,7 +16,6 @@ module EQUAL(
     always @ (*) begin
 
 		case (OP)
-
             
             //beq
             4'b1010: begin
@@ -55,7 +54,7 @@ module EQUAL(
             end
 
             default: begin 
-					$display("equal.v is wrong!");
+					//$display("equal.v is wrong!");
 					_ZERO = 0;
 				end
 
