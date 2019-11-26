@@ -73,7 +73,6 @@ module RISCV_TOP (
 	end
 
 	always @ (negedge CLK) begin
-	/*
 	cnt = cnt+1;
         $display("\n");
         $display("--start cycle--");
@@ -117,7 +116,6 @@ module RISCV_TOP (
         $display("----WB----");
         $display("NUMINST: %b",NUM_INST);
         $display("\n");
-	*/
     end
 
 

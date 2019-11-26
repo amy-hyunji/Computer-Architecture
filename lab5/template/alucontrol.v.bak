@@ -73,7 +73,7 @@ module ALUCONTROL (
 				endcase
 			end
 		end
-		else if (OPCODE == 7'b0010011) begin
+		else if (OPCODE == 4'b0010011) begin
 			case(FUNCT3)
 			3'b000: //addi
 				_CONTROLOUT = 4'b0000;
