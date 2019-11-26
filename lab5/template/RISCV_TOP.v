@@ -37,19 +37,27 @@ module RISCV_TOP (
 
 	// Only allow for NUM_INST
 	always @ (negedge CLK) begin
-		if (RSTn) NUM_INST <= NUM_INST + 1;
+		if (RSTn) NUM_INST <= NUM_INST + NUMINSTADD;
 	end
 
 	// TODO: implement
 
-	wire [31:0] PC_IN, PC_OUT, IMM_IN, IMM_OUT, Be_OUT, ALU_D, BMUX_OUT, CUR_INST, CONDALU_OUT, nPC_IN, ALUOUT_D, Aout_IN, Aout_OUT, WD_IN, Ae_OUT, AMUX_OUT, PCr_IN, PCr_OUT, CONDMUX_OUT, PCALU_OUT, nPC_OUT, PCm_IN, PCm_OUT, BM_IN, MDRw_IN, MDRw_OUT;
+	wire [31:0] PC_IN, PC_OUT, IMM_IN, IMM_OUT, Be_OUT, ALU_D, BMUX_OUT, CUR_INST, CONDALU_OUT, nPC_IN, ALUOUT_D, Aout_IN, Aout_OUT, Ae_OUT, AMUX_OUT, PCr_OUT, CONDMUX_OUT, PCALU_OUT, nPC_OUT, PCm_OUT, MDRw_OUT, ADDR_OUT, PREV_DEST, FMUX1OUT, FMUX2OUT;
+    wire [31:0] ZERO_EX_MEM, ZERO_MEM_WB, ZERO_WB_OUT;
 	wire [11:0] I_TEMP;
 	wire [6:0] OPCODE, ALUCONTROL_IN, FUNCT7;
-	wire [4:0] PREV_DEST; 
-	wire [3:0] ALUCONTROL_OUT;
+	wire [3:0] ALUCONTROL_OUT, ALUCONTROL_EX_OUT; 
 	wire [2:0] FUNCT3;
-	wire [1:0] BMUX;
-	wire ISJALR, REWR_MUX, AMUX, CONDMUX, IR_WR, PC_WR, PREV_REWR_MUX, ZERO;
+	wire [1:0] BMUX_EX_IN, BMUX_EX_OUT;
+	wire ISJALR, AMUX_EX_IN, AMUX_EX_OUT, CONDMUX, IR_WR, PC_WR, PREV_REWR_MUX, ZERO, FLUSH;
+    wire RF_WE_ID_EX_IN, RF_WE_EX_MEM_IN, RF_WE_MEM_WB_IN;
+    wire [1:0] MREWR_MUX_ID_EX_IN, MREWR_MUX_EX_MEM_IN, MREWR_MUX_MEM_WB_IN, MREWR_MUX_SIG;
+    wire D_MEM_WEN_ID_EX_IN, D_MEM_WEN_EX_MEM_IN;
+    wire [3:0] D_MEM_BE_ID_EX_IN, D_MEM_BE_EX_MEM_IN;
+    wire [4:0] RS1EX, RS2EX, RDEX, RDMEM, RDWB;
+    wire [1:0] FORWARDMUX1, FORWARDMUX2;
+    wire D_MEM_CSN_ID_EX_IN, D_MEM_CSN_EX_MEM_IN;
+    wire NUMINSTADD, NUMINSTADD_ID_EX_IN, NUMINSTADD_EX_MEM_IN, NUMINSTADD_MEM_WB_IN;
 	
 	initial begin
 		I_MEM_ADDR = 0;
@@ -59,30 +67,33 @@ module RISCV_TOP (
 		assign I_MEM_ADDR = I_TEMP;
 	end
 
-	CONTROL control (
+	CONTROL control ( //ok
 		.OPCODE(OPCODE),
 		.RSTn(RSTn),
 		.CLK(CLK),
 		.RD1(RF_RA1),
 		.RD2(RF_RA2),
-		.PREV_DEST(PREV_DEST), //previous instruction WD
-		.PREV_REWR_MUX(PREV_REWR_MUX),
-		.D_MEM_BE(D_MEM_BE),
-		.RF_WE(RF_WE),
-		.D_MEM_WEN(D_MEM_WEN),
-		.D_MEM_CSN(D_MEM_CSN),
+		.PREV_DEST(PREV_DEST[4:0]), //previous instruction WD
+		.PREV_REWR_MUX(MREWR_MUX_EX_MEM_IN),
+        .ZERO(ZERO),
+		.D_MEM_BE(D_MEM_BE_ID_EX_IN),
+		.RF_WE(RF_WE_ID_EX_IN),
+		.D_MEM_WEN(D_MEM_WEN_ID_EX_IN),
+		.D_MEM_CSN(D_MEM_CSN_ID_EX_IN),
 		.I_MEM_CSN(I_MEM_CSN),
-		.REWR_MUX(REWR_MUX),
-		.AMUX(AMUX),
+		.REWR_MUX(MREWR_MUX_ID_EX_IN),
+		.AMUX(AMUX_EX_IN),
 		.ISJALR(ISJALR),
 		.CONDMUX(CONDMUX),
 		.ALU_CONTROL(ALUCONTROL_IN),
-		.BMUX(BMUX),
+		.BMUX(BMUX_EX_IN),
 		.IR_WR(IR_WR),
-		.PC_WR(PC_WR)
+		.PC_WR(PC_WR),
+        .FLUSH(FLUSH),
+        .NUMINSTADD(NUMINSTADD_ID_EX_IN)
 	);
 
-	CONTROLREG pc (
+	CONTROLREG pc ( //ok
 		.CLK(CLK),
 		.WREN(PC_WR),
 		.RSTn(RSTn),
@@ -90,52 +101,148 @@ module RISCV_TOP (
 		.OUT_VAL(PC_OUT)
 	);
 
-	ALUCONTROL alucontrol(
+	ALUCONTROL alucontrol( //ok
 		.OPCODE(ALUCONTROL_IN),
 		.FUNCT3(FUNCT3),
 		.FUNCT7(FUNCT7),
 		.CONTROLOUT(ALUCONTROL_OUT)
 	);
 
-	isJALR isjalr (
+    // forwarding
+    // ------------------------
+    FORWARD forward(
+        .rs1ex(RS1EX),
+        .rs2ex(RS2EX),
+        .destmem(RDMEM),
+        .destwb(RDWB),
+        .regwritemem(RF_WE_MEM_WB_IN),
+        .regwritewb(RF_WE),
+        .rs1for(FORWARDMUX1),
+        .rs2for(FORWARDMUX2)
+    );
+
+    TWOBITMUX fmux1(
+        .SIGNAL(FORWARDMUX1),
+        .INPUT1(AMUX_OUT),
+        .INPUT2(ALUOUT_D),
+        .INPUT3(MDRw_OUT),
+        .INPUT4(0),
+        .OUTPUT(FMUX1OUT)
+    );
+
+    TWOBITMUX fmux2(
+        .SIGNAL(FORWARDMUX2),
+        .INPUT1(BMUX_OUT),
+        .INPUT2(ALUOUT_D),
+        .INPUT3(MDRw_OUT),
+        .INPUT4(0),
+        .OUTPUT(FMUX2OUT)
+    );
+
+
+    // ------------------------
+
+    EXREG exreg( //ok
+        .ALUCONTROLOUT_IN(ALUCONTROL_OUT),
+        .AMUX_IN(AMUX_EX_IN),
+        .BMUX_IN(BMUX_EX_IN),
+        .CLK(CLK),
+        .ALUCONTROLOUT_OUT(ALUCONTROL_EX_OUT),
+        .AMUX_OUT(AMUX_EX_OUT),
+        .BMUX_OUT(BMUX_EX_OUT)
+    );
+
+    MEMREG id_ex_memreg ( //OK
+        .D_MEM_WEN_IN(D_MEM_WEN_ID_EX_IN),
+        .D_MEM_BE_IN(D_MEM_BE_ID_EX_IN),
+        .D_MEM_CSN_IN(D_MEM_CSN_ID_EX_IN),
+        .CLK(CLK),
+        .D_MEM_WEN_OUT(D_MEM_WEN_EX_MEM_IN),
+        .D_MEM_BE_OUT(D_MEM_BE_EX_MEM_IN),
+        .D_MEM_CSN_OUT(D_MEM_CSN_EX_MEM_IN)
+    );
+
+    MEMREG ex_mem_memreg ( //ok
+        .D_MEM_WEN_IN(D_MEM_WEN_EX_MEM_IN),
+        .D_MEM_BE_IN(D_MEM_BE_EX_MEM_IN),
+        .D_MEM_CSN_IN(D_MEM_CSN_EX_MEM_IN),
+        .CLK(CLK),
+        .D_MEM_WEN_OUT(D_MEM_WEN),
+        .D_MEM_BE_OUT(D_MEM_BE),
+        .D_MEM_CSN_OUT(D_MEM_CSN)
+    );
+
+    WBREG id_ex_wbreg( //OK
+        .RF_WE_IN(RF_WE_ID_EX_IN),
+        .MREWR_MUX_IN(MREWR_MUX_ID_EX_IN),
+        .NUMINSTADD_IN(NUMINSTADD_ID_EX_IN),
+        .CLK(CLK),
+        .RF_WE_OUT(RF_WE_EX_MEM_IN),
+        .MREWR_MUX_OUT(MREWR_MUX_EX_MEM_IN),
+        .NUMINSTADD_OUT(NUMINSTADD_EX_MEM_IN)
+    );
+
+    WBREG ex_mem_wbreg( //OK
+        .RF_WE_IN(RF_WE_EX_MEM_IN),
+        .MREWR_MUX_IN(MREWR_MUX_EX_MEM_IN),
+        .NUMINSTADD_IN(NUMINSTADD_EX_MEM_IN),
+        .CLK(CLK),
+        .RF_WE_OUT(RF_WE_MEM_WB_IN),
+        .MREWR_MUX_OUT(MREWR_MUX_MEM_WB_IN),
+        .NUMINSTADD_OUT(NUMINSTADD_MEM_WB_IN)
+    );
+
+    WBREG mem_wb_wbreg( //OK
+        .RF_WE_IN(RF_WE_MEM_WB_IN),
+        .MREWR_MUX_IN(MREWR_MUX_MEM_WB_IN),
+        .NUMINSTADD_IN(NUMINSTADD_MEM_WB_IN),
+        .CLK(CLK),
+        .RF_WE_OUT(RF_WE),
+        .MREWR_MUX_OUT(MREWR_MUX_SIG),
+        .NUMINSTADD_OUT(NUMINSTADD)
+    );
+
+	isJALR isjalr ( //OK
 		.ISJALR(ISJALR),
 		.ALUI_OUTPUT(CONDALU_OUT),
 		.OUTPUT(nPC_IN)
 	);
 
-	HALT halt (
+	HALT halt ( //OK
 		.CUR_INST(CUR_INST),
 		.NXT_INST(I_MEM_DI),
 		._halt(HALT)
 	);
 
-	TRANSLATE i_translate(
+	TRANSLATE i_translate( //OK
 		.E_ADDR(PC_OUT),
 		.T_ADDR(I_TEMP)
 	);
 	
-	TRANSLATE d_translate(
+	TRANSLATE d_translate( //OK
 		.E_ADDR(ALUOUT_D),
 		.T_ADDR(D_MEM_ADDR)
 	);
 
 	///MUX///////////////////////
-	ONEBITMUX MREWR_MUX(
-		.SIGNAL(REWR_MUX),
-		.INPUT1(MDRw_OUT),
-		.INPUT2(Aout_OUT),
-		.OUTPUT(WD_IN)
+	TWOBITMUX MREWR_MUX( //OK
+		.SIGNAL(MREWR_MUX_SIG),
+		.INPUT1(ADDR_OUT),
+		.INPUT2(MDRw_OUT),
+        .INPUT3(Aout_OUT),
+        .INPUT4(ZERO_WB_OUT),
+		.OUTPUT(RF_WD)
 	);
 
-	ONEBITMUX MAMUX(
-		.SIGNAL(AMUX),
+	ONEBITMUX MAMUX( //OK
+		.SIGNAL(AMUX_EX_OUT),
 		.INPUT1(PCm_OUT),
 		.INPUT2(Ae_OUT),
 		.OUTPUT(AMUX_OUT)
 	);
 
-	TWOBITMUX MBMUX(
-		.SIGNAL(BMUX),
+	TWOBITMUX MBMUX( //OK
+		.SIGNAL(BMUX_EX_OUT),
 		.INPUT1(IMM_OUT),
 		.INPUT2(32'b00000000000000000000000000000100),
 		.INPUT3(32'b00000000000000000000000000000000),
@@ -143,14 +250,14 @@ module RISCV_TOP (
 		.OUTPUT(BMUX_OUT)
 	);
 
-	ONEBITMUX MCONDMUX(
+	ONEBITMUX MCONDMUX( //OK
 		.SIGNAL(CONDMUX),
 		.INPUT1(PCr_OUT),
-		.INPUT2(RF_RD2),
+		.INPUT2(RF_RD1),
 		.OUTPUT(CONDMUX_OUT)
 	);
 
-	ONEBITMUX MPCMUX(
+	ONEBITMUX MPCMUX( //ok
 		.SIGNAL(PC_WR),
 		.INPUT1(PCALU_OUT),
 		.INPUT2(nPC_OUT),
@@ -160,46 +267,47 @@ module RISCV_TOP (
 
 
 	///ALU///////////////////////
-	ALU CONDALU(
+	ALU CONDALU( //ok
 		.OP(4'b0000),
 		.A(CONDMUX_OUT),
 		.B(IMM_IN),
 		.Out(CONDALU_OUT)
 	);
 
-	ALU REGALU(
-		.OP(ALUCONTROL_OUT),
-		.A(AMUX_OUT),
-		.B(BMUX_OUT),
+	ALU REGALU( //ok
+		.OP(ALUCONTROL_EX_OUT),
+		.A(FMUX1OUT),
+		.B(FMUX2OUT),
 		.Out(ALU_D)
 	);
 
-	ALU PCALU(
+	ALU PCALU( //ok
 		.OP(4'b0000),
 		.A(PC_OUT),
 		.B(32'b00000000000000000000000000000100),
 		.Out(PCALU_OUT)
 	);
 
-	EQUAL equal(
+	EQUAL equal( //OK
 		.OP(ALUCONTROL_OUT),
 		.A(RF_RD1),
 		.B(RF_RD2),
-		.Zero(ZERO)
+		.Zero(ZERO) 
 	);
 	/////////////////////////////
 
 	//IF/ID pipeline registers//
-	REG PCr (
+	REG PCr ( //ok
 		.CLK(CLK),
-		.IN_VAL(PCr_IN),
+		.IN_VAL(PC_OUT),
 		.OUT_VAL(PCr_OUT)
 	);
 
-	INSTREG instreg (
+	INSTREG instreg ( //ok
 		.CLK(CLK),
 		.INSTRUCTION(I_MEM_DI),
 		.IRWRITE(IR_WR),
+        .DUMMY(FLUSH),
 		.OPCODE(OPCODE),
 		.IMMEDIATE(IMM_IN),
 		.RS1(RF_RA1),
@@ -212,64 +320,125 @@ module RISCV_TOP (
 	/////////////////////////////
 	
 	//ID/EX pipeline registers//
-	REG nPC(
+	REG nPC( //OK
 		.CLK(CLK),
 		.IN_VAL(nPC_IN),
 		.OUT_VAL(nPC_OUT)
 	);
 
-	REG imm (
+	REG imm ( //OK
 		.CLK(CLK),
 		.IN_VAL(IMM_IN),
 		.OUT_VAL(IMM_OUT)
 	);
 
-	REG PCm(
+	REG PCm( //OK
 		.CLK(CLK),
-		.IN_VAL(PCm_IN),
+		.IN_VAL(PCr_OUT),
 		.OUT_VAL(PCm_OUT)
 	);
 
-	REG Ae(
+	REG Ae( //OK
 		.CLK(CLK),
 		.IN_VAL(RF_RD1),
 		.OUT_VAL(Ae_OUT)
 	);
 
-	REG Be(
+	REG Be( //OK
 		.CLK(CLK),
 		.IN_VAL(RF_RD2),
 		.OUT_VAL(Be_OUT)
 	);
+
+    REG WRe( //WARNING
+        .CLK(CLK),
+        .IN_VAL({27'b000000000000000000000000000, RF_WA1}),
+        .OUT_VAL(PREV_DEST) //NEED to check if this causes error - is 5bit but is assigned to 32bit
+    );
+
+    REG id_ex_zero( //OK
+        .CLK(CLK),
+        .IN_VAL({31'b0000000000000000000000000000000, FLUSH}),
+        .OUT_VAL(ZERO_EX_MEM)
+    );
+
+    BIT5REG id_ex_rs1(
+        .CLK(CLK),
+        .IN_VAL(RF_RA1),
+        .OUT_VAL(RS1EX)
+    );
+
+    BIT5REG id_ex_rs2(
+        .CLK(CLK),
+        .IN_VAL(RF_RA2),
+        .OUT_VAL(RS2EX)
+    );
+
+    BIT5REG id_ex_rd(
+        .CLK(CLK),
+        .IN_VAL(RF_WA1),
+        .OUT_VAL(RDEX)
+    );
 	/////////////////////////////
 	
 	//EX/MEM pipeline registers//
-	REG aluout (
+	REG aluout ( //ok
 		.CLK(CLK),
 		.IN_VAL(ALU_D),
 		.OUT_VAL(ALUOUT_D)
 	);
 
-	REG Bm (
+	REG Bm ( //ok
 		.CLK(CLK),
-		.IN_VAL(BM_IN),
+		.IN_VAL(Be_OUT),
 		.OUT_VAL(D_MEM_DOUT)
 	);
+
+    REG ex_mem_zero( //ok
+        .CLK(CLK),
+        .IN_VAL(ZERO_EX_MEM),
+        .OUT_VAL(ZERO_MEM_WB)
+    );
+
+    BIT5REG ex_mem_rd(
+        .CLK(CLK),
+        .IN_VAL(RDEX),
+        .OUT_VAL(RDMEM)
+    );
 	/////////////////////////////
 
 	//MEM_WB pipeline registers//
-	REG MDRw (
+	REG MDRw ( //OK
 		.CLK(CLK),
-		.IN_VAL(MDRw_IN),
+		.IN_VAL(D_MEM_DI),
 		.OUT_VAL(MDRw_OUT)
 	);
 
-	REG Aout (
+	REG Aout ( //OK
 		.CLK(CLK),
-		.IN_VAL(Aout_IN),
+		.IN_VAL(ALUOUT_D),
 		.OUT_VAL(Aout_OUT)
 	);
+
+    REG ADDR( //OK
+        .CLK(CLK),
+        .IN_VAL(ALUOUT_D),
+        .OUT_VAL(ADDR_OUT)
+    );
+
+    REG mem_wr_zero( //ok
+        .CLK(CLK),
+        .IN_VAL(ZERO_MEM_WB),
+        .OUT_VAL(ZERO_WB_OUT)
+    );
+
+    BIT5REG mem_wb_rd(
+        .CLK(CLK),
+        .IN_VAL(RDMEM),
+        .OUT_VAL(RDWB)
+    );
 	/////////////////////////////
+
 
 
 endmodule //

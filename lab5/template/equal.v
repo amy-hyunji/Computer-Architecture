@@ -19,38 +19,62 @@ module EQUAL(
             
             //beq
             4'b1010: begin
-                if (A == B) _ZERO = 1;
-					 else _ZERO = 0;
+                if (A == B) begin
+                    _ZERO = 1;
+                end
+                else begin
+                    _ZERO = 0;
 				end
+            end
 
             //bne
             4'b1011: begin
-                if (A != B) _ZERO = 1;
-					 else _ZERO = 0;
+                if (A != B) begin
+                    _ZERO = 1;
+                end
+                else begin
+                    _ZERO = 0;
+                end
             end
 
             //blt
             4'b1100: begin
-                if ($signed(A) < $signed(B)) _ZERO = 1;
-					 else _ZERO = 0;
+                if ($signed(A) < $signed(B)) begin
+                    _ZERO = 1;
+                end
+			    else begin
+                    _ZERO = 0;
+                end
             end
 
             //bge
             4'b1101: begin
-                if ($signed(A) >= $signed(B)) _ZERO = 1;
-					 else _ZERO = 0;
-				end
+                if ($signed(A) >= $signed(B)) begin
+                    _ZERO = 1;
+                end
+			    else begin
+                    _ZERO = 0;
+                end
+			end
 
             //bltu
             4'b1110: begin
-                if (A < B) _ZERO = 1;
-					 else _ZERO = 0;
+                if (A < B) begin
+                    _ZERO = 1;
+                end
+			    else begin
+                    _ZERO = 0;
+                end
             end
 
             //bgeu
             4'b1111: begin
-                if(A >= B) _ZERO = 1;
-					 else _ZERO = 0;
+                if(A >= B) begin
+                    _ZERO = 1;
+                end
+                else begin
+                    _ZERO = 0;
+                end
             end
 
             default: begin 

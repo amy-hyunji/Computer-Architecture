@@ -1,10 +1,9 @@
 module INSTREG(
 		// wire to instruction register only when IRWRITE == 1 synchronous
-
-
 		input CLK,
 		input [31:0] INSTRUCTION,
-      input IRWRITE,
+        input IRWRITE,
+        input DUMMY,
 
 		output [6:0] OPCODE,
 		output [31:0] IMMEDIATE,
@@ -25,6 +24,7 @@ module INSTREG(
 		reg[2:0] _FUNCT3;
 		reg[6:0] _FUNCT7;
 		reg[4:0] _RD;
+        reg[31:0] _DUMMY;
 
 		assign CUR_INST = TEMP_INST;
 		assign OPCODE = _OPCODE;
@@ -44,10 +44,14 @@ module INSTREG(
 			_FUNCT3 = 0;
 			_FUNCT7 = 0;
 			_RD = 0;
+            _DUMMY = 32'b00000000000000000000000000000000;
 		end
 
 		always@ (posedge CLK) begin
-			if (IRWRITE) TEMP_INST <= INSTRUCTION;
+            if (IRWRITE) begin
+                if (DUMMY) TEMP_INST <= _DUMMY;
+                else TEMP_INST <= INSTRUCTION;
+            end
 		end
 
 		always@ (TEMP_INST) begin
@@ -99,6 +103,9 @@ module INSTREG(
 				  if (_IMMEDIATE[12] == 0) _IMMEDIATE[31:13] = 0;
 				  else _IMMEDIATE[31:13] = 19'b1111111111111111111;
 			end
+            7'b0000000: begin // DUMMY
+                _IMMEDIATE = 0;
+            end
 		 endcase
 		end
 endmodule

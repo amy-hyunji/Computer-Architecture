@@ -41,6 +41,8 @@ module ALUCONTROL (
 			_CONTROLOUT = 4'b0000;
 		else if(OPCODE == 7'b1100111) //JALR
 			_CONTROLOUT = 4'b0000;
+        else if (OPCODE == 7'b0000000) //dummy
+            _CONTROLOUT = 4'b0000;
 		else if (OPCODE == 7'b0110011 | OPCODE == 7'b0010011) begin
 			if (FUNCT7 == 7'b0000000) begin
 				case (FUNCT3)
