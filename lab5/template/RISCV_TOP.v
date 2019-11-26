@@ -49,6 +49,7 @@ module RISCV_TOP (
     wire D_MEM_CSN_ID_EX_IN, D_MEM_CSN_EX_MEM_IN;
     wire NUMINSTADD, NUMINSTADD_ID_EX_IN, NUMINSTADD_EX_MEM_IN, NUMINSTADD_MEM_WB_IN, PCMUX;
 
+    reg [31:0] cnt;
     assign RF_WA1 = RDWB;
 	assign OUTPUT_PORT = RF_WD;
 
@@ -63,6 +64,7 @@ module RISCV_TOP (
 	
 	initial begin
 		I_MEM_ADDR = 0;
+		cnt = 0;
 	end
 
 	always@ (I_TEMP) begin
@@ -70,40 +72,42 @@ module RISCV_TOP (
 	end
 
 	always @ (negedge CLK) begin
+	cnt = cnt+1;
         $display("\n");
         $display("--start cycle--");
+	$display("cnt: %d",cnt);
         $display("IMEMDI: %b", I_MEM_DI);
-        /*
+        
         $display("----IF-----");
         $display("IMEMDI: %b", I_MEM_DI);
         $display("-----ID------");
         $display("numinstadd: %b",NUMINSTADD_ID_EX_IN);
-        $display("rfra1: %b", RF_RA1);
-        $display("rfra2: %b", RF_RA2);
+        //$display("rfra1: %b", RF_RA1);
+        //$display("rfra2: %b", RF_RA2);
         $display("ALU_D: %b", ALU_D);
-        */
+        
         $display("rd: %b", RDID);
-        //$display("amux signal: %b",AMUX_EX_OUT);
-        //$display("amux out: %b", AMUX_OUT);
-        //$display("bmux signal: %b",BMUX_EX_OUT);
-        //$display("bmux out: %b", BMUX_OUT);
-        //$display("alucontrolout :%b", ALUCONTROL_EX_OUT);
-        /*
-        $display("regwrite: %b", RF_WE_ID_EX_IN);
-        $display("----EX----");
+        $display("amux signal: %b",AMUX_EX_OUT);
+        $display("amux out: %b", AMUX_OUT);
+        $display("bmux signal: %b",BMUX_EX_OUT);
+        $display("bmux out: %b", BMUX_OUT);
+        $display("alucontrolout :%b", ALUCONTROL_EX_OUT);
+        
+        //$display("regwrite: %b", RF_WE_ID_EX_IN);
+        
         $display("forwardmux1 : %b",FORWARDMUX1);
         $display("forwardmux2 : %b",FORWARDMUX2);
         $display("fmux1out: %b", FMUX1OUT);
         $display("fmux2out: %b", FMUX2OUT);
         $display("forwardmux1: %b",FORWARDMUX1);
         $display("forwardmux2: %b",FORWARDMUX2);
-        */
+        
         $display("destex: %b",RDEX);
-        /*
+        $display("aluoutd: %b", ALUOUT_D);
         $display("r1sex: %b",RS1EX);
         $display("r2sex: %b",RS2EX);
         $display("---MEM---");
-        */
+        
         $display("destmem: %b",RDMEM);
         $display("----WB----");
         $display("NUMINST: %b",NUM_INST);
@@ -170,7 +174,7 @@ module RISCV_TOP (
         .SIGNAL(FORWARDMUX1),
         .INPUT1(AMUX_OUT),
         .INPUT2(ALUOUT_D),
-        .INPUT3(MDRw_OUT),
+        .INPUT3(RF_WD),
         .INPUT4(0),
         .OUTPUT(FMUX1OUT)
     );
@@ -179,7 +183,7 @@ module RISCV_TOP (
         .SIGNAL(FORWARDMUX2),
         .INPUT1(BMUX_OUT),
         .INPUT2(ALUOUT_D),
-        .INPUT3(MDRw_OUT),
+        .INPUT3(RF_WD),
         .INPUT4(0),
         .OUTPUT(FMUX2OUT)
     );
