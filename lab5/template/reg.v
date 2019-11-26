@@ -65,3 +65,24 @@ module BIT5REG(
 			_VAL = IN_VAL;
 		end
 endmodule
+
+module BIT1REG(
+
+		input CLK,
+		input IN_VAL,
+
+		output OUT_VAL
+
+		);
+
+		reg _VAL;
+
+		assign OUT_VAL = _VAL;
+
+		initial _VAL = 0;
+
+		always@ (posedge CLK) begin
+			_VAL = IN_VAL;
+		end
+endmodule
+

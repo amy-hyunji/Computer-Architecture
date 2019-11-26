@@ -47,7 +47,7 @@ module RISCV_TOP (
     wire [4:0] RS1EX, RS2EX, RDID, RDEX, RDMEM, RDWB;
     wire [1:0] FORWARDMUX1, FORWARDMUX2;
     wire D_MEM_CSN_ID_EX_IN, D_MEM_CSN_EX_MEM_IN;
-    wire NUMINSTADD, NUMINSTADD_ID_EX_IN, NUMINSTADD_EX_MEM_IN, NUMINSTADD_MEM_WB_IN, PCMUX;
+    wire NUMINSTADD, NUMINSTADD_ID_EX_IN, NUMINSTADD_EX_MEM_IN, NUMINSTADD_MEM_WB_IN, PCMUX, USE_RS1_IN, USE_RS2_IN, USE_RS1_OUT, USE_RS2_OUT;
 
     reg [31:0] cnt;
     assign RF_WA1 = RDWB;
@@ -139,7 +139,9 @@ module RISCV_TOP (
 		.PC_WR(PC_WR),
         .FLUSH(FLUSH),
         .NUMINSTADD(NUMINSTADD_ID_EX_IN),
-        .PCMUX(PCMUX)
+        .PCMUX(PCMUX),
+        .USE_RS1_IN(USE_RS1_IN),
+        .USE_RS2_IN(USE_RS2_IN)
 	);
 
 	CONTROLREG pc ( //ok
@@ -166,6 +168,8 @@ module RISCV_TOP (
         .destwb(RDWB),
         .regwritemem(RF_WE_MEM_WB_IN),
         .regwritewb(RF_WE),
+        .users1(USE_RS1_OUT),
+        .users2(USE_RS2_OUT),
         .rs1for(FORWARDMUX1),
         .rs2for(FORWARDMUX2)
     );
@@ -374,6 +378,18 @@ module RISCV_TOP (
 		.IN_VAL(nPC_IN),
 		.OUT_VAL(nPC_OUT)
 	);
+
+    BIT1REG users1reg(
+        .CLK(CLK),
+        .IN_VAL(USE_RS1_IN),
+        .OUT_VAL(USE_RS1_OUT)
+    );
+
+    BIT1REG users2reg(
+        .CLK(CLK),
+        .IN_VAL(USE_RS2_IN),
+        .OUT_VAL(USE_RS2_OUT)
+    );
 
 	REG imm ( //OK
 		.CLK(CLK),

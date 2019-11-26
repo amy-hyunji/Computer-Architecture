@@ -13,14 +13,15 @@ module CONTROL (
 	output wire RF_WE, D_MEM_WEN, D_MEM_CSN, I_MEM_CSN, AMUX, ISJALR, CONDMUX, 
 	output wire [6:0] ALU_CONTROL,
 	output wire [1:0] BMUX, REWR_MUX,
-	output wire IR_WR, PC_WR, FLUSH, NUMINSTADD, PCMUX
+	output wire IR_WR, PC_WR, FLUSH, NUMINSTADD, PCMUX,
+    output wire USE_RS1_IN, USE_RS2_IN
 	);
 
 
 	reg[6:0] _ALU_CONTROL;
 	reg[3:0] _D_MEM_BE;
 	reg[1:0] _BMUX, _REWR_MUX;
-	reg _RE_WE, _D_MEM_WEN, _AMUX, _IS_JALR, _CONDMUX, _STALL, _FLUSH, _NUMINSTADD, _PCMUX; 
+	reg _RE_WE, _D_MEM_WEN, _AMUX, _IS_JALR, _CONDMUX, _STALL, _FLUSH, _NUMINSTADD, _PCMUX, _USE_RS1_IN, _USE_RS2_IN; 
 	
 	assign ALU_CONTROL = _ALU_CONTROL;
 	assign IR_WR = ~_STALL;
@@ -38,6 +39,8 @@ module CONTROL (
     assign FLUSH = _FLUSH;
     assign NUMINSTADD = _NUMINSTADD;
     assign PCMUX = _PCMUX;
+    assign USE_RS1_IN = _USE_RS1_IN;
+    assign USE_RS2_IN = _USE_RS2_IN;
 
 	initial begin
 		_ALU_CONTROL <=0;
@@ -52,6 +55,8 @@ module CONTROL (
         _FLUSH <= 0;
         _D_MEM_BE <= 0;
         _PCMUX <= 0;
+        _USE_RS1_IN <= 0;
+        _USE_RS2_IN <= 0;
 	end
 
 
@@ -72,6 +77,8 @@ module CONTROL (
 			_IS_JALR = 0;
             _NUMINSTADD = 1;
             _PCMUX = 0;
+            _USE_RS1_IN = 1;
+            _USE_RS2_IN = 1;
 			// detect load data hazard
 			_STALL = ((RD1==PREV_DEST) | (RD2==PREV_DEST)) & (PREV_REWR_MUX == 2'b01); 
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -99,6 +106,8 @@ module CONTROL (
             // detect load data hazard
             _STALL = (RD1==PREV_DEST) & (PREV_REWR_MUX==2'b01);  
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
+            _USE_RS1_IN = 1;
+            _USE_RS2_IN = 0;
            if (_STALL == 1) begin
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
@@ -121,6 +130,8 @@ module CONTROL (
             _REWR_MUX = 2'b00;
             _NUMINSTADD = 1;
             _PCMUX = 0;
+            _USE_RS1_IN = 1;
+            _USE_RS2_IN = 1;
             // detect load data hazard
             _STALL = ((RD1==PREV_DEST) | (RD2==PREV_DEST)) & (PREV_REWR_MUX==2'b01);  
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -145,6 +156,8 @@ module CONTROL (
             _IS_JALR = 0;
             _NUMINSTADD = 1;
             _PCMUX = 0;
+            _USE_RS1_IN = 1;
+            _USE_RS2_IN = 0;
             // detect load data hazard
             _STALL = (RD1==PREV_DEST) & (PREV_REWR_MUX==2'b01);  
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -170,6 +183,8 @@ module CONTROL (
             _CONDMUX = 0;
             _NUMINSTADD = 1;
             _PCMUX = 1;
+            _USE_RS1_IN = 1;
+            _USE_RS2_IN = 1;
             // detect load data hazard
             _STALL = ((RD1==PREV_DEST) | (RD2==PREV_DEST)) & (PREV_REWR_MUX == 2'b01); 
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -195,6 +210,8 @@ module CONTROL (
             _CONDMUX = 0;
             _NUMINSTADD = 1;
             _PCMUX = 1;
+            _USE_RS1_IN = 0;
+            _USE_RS2_IN = 0;
             // detect load data hazard
             _STALL = 0;
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -212,6 +229,8 @@ module CONTROL (
             _CONDMUX = 1;
             _NUMINSTADD = 1;
             _PCMUX = 1;
+            _USE_RS1_IN = 1;
+            _USE_RS2_IN = 0;
             // detect load data hazard
             _STALL = (RD1==PREV_DEST) & (PREV_REWR_MUX==2'b01); 
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
