@@ -71,6 +71,7 @@ module CONTROL (
 			_BMUX = 2'b11;
 			_IS_JALR = 0;
             _NUMINSTADD = 1;
+            _PCMUX = 0;
 			// detect load data hazard
 			_STALL = ((RD1==PREV_DEST) | (RD2==PREV_DEST)) & (PREV_REWR_MUX == 2'b01); 
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -94,6 +95,7 @@ module CONTROL (
             _BMUX = 2'b00;
             _IS_JALR = 0;
             _NUMINSTADD = 1;
+            _PCMUX = 0;
             // detect load data hazard
             _STALL = (RD1==PREV_DEST) & (PREV_REWR_MUX==2'b01);  
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -118,6 +120,7 @@ module CONTROL (
             _IS_JALR = 0;
             _REWR_MUX = 2'b00;
             _NUMINSTADD = 1;
+            _PCMUX = 0;
             // detect load data hazard
             _STALL = ((RD1==PREV_DEST) | (RD2==PREV_DEST)) & (PREV_REWR_MUX==2'b01);  
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -141,6 +144,7 @@ module CONTROL (
             _BMUX = 2'b00;
             _IS_JALR = 0;
             _NUMINSTADD = 1;
+            _PCMUX = 0;
             // detect load data hazard
             _STALL = (RD1==PREV_DEST) & (PREV_REWR_MUX==2'b01);  
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -165,6 +169,7 @@ module CONTROL (
             _IS_JALR = 0;
             _CONDMUX = 0;
             _NUMINSTADD = 1;
+            _PCMUX = 1;
             // detect load data hazard
             _STALL = ((RD1==PREV_DEST) | (RD2==PREV_DEST)) & (PREV_REWR_MUX == 2'b01); 
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -189,6 +194,7 @@ module CONTROL (
             _IS_JALR = 0;
             _CONDMUX = 0;
             _NUMINSTADD = 1;
+            _PCMUX = 1;
             // detect load data hazard
             _STALL = 0;
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
@@ -205,6 +211,7 @@ module CONTROL (
             _IS_JALR = 1;
             _CONDMUX = 1;
             _NUMINSTADD = 1;
+            _PCMUX = 1;
             // detect load data hazard
             _STALL = (RD1==PREV_DEST) & (PREV_REWR_MUX==2'b01); 
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
