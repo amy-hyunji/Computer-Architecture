@@ -13,14 +13,14 @@ module CONTROL (
 	output wire RF_WE, D_MEM_WEN, D_MEM_CSN, I_MEM_CSN, AMUX, ISJALR, CONDMUX, 
 	output wire [6:0] ALU_CONTROL,
 	output wire [1:0] BMUX, REWR_MUX,
-	output wire IR_WR, PC_WR, FLUSH, NUMINSTADD
+	output wire IR_WR, PC_WR, FLUSH, NUMINSTADD, PCMUX
 	);
 
 
 	reg[6:0] _ALU_CONTROL;
 	reg[3:0] _D_MEM_BE;
 	reg[1:0] _BMUX, _REWR_MUX;
-	reg _RE_WE, _D_MEM_WEN, _AMUX, _IS_JALR, _CONDMUX, _STALL, _FLUSH, _NUMINSTADD; 
+	reg _RE_WE, _D_MEM_WEN, _AMUX, _IS_JALR, _CONDMUX, _STALL, _FLUSH, _NUMINSTADD, _PCMUX; 
 	
 	assign ALU_CONTROL = _ALU_CONTROL;
 	assign IR_WR = ~_STALL;
@@ -37,6 +37,7 @@ module CONTROL (
 	assign I_MEM_CSN = ~RSTn;
     assign FLUSH = _FLUSH;
     assign NUMINSTADD = _NUMINSTADD;
+    assign PCMUX = _PCMUX;
 
 	initial begin
 		_ALU_CONTROL <=0;
@@ -49,6 +50,8 @@ module CONTROL (
 		_CONDMUX <= 0;
 		_NUMINSTADD <= 0;
         _FLUSH <= 0;
+        _D_MEM_BE <= 0;
+        _PCMUX <= 0;
 	end
 
 
@@ -187,16 +190,8 @@ module CONTROL (
             _CONDMUX = 0;
             _NUMINSTADD = 1;
             // detect load data hazard
-            _STALL = (RD1==PREV_DEST) & (PREV_REWR_MUX == 2'b01); 
+            _STALL = 0;
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
-            if (_STALL == 1) begin
-                _ALU_CONTROL = OPCODE;
-                _RE_WE = 0;
-                _D_MEM_WEN = 1;
-                _IS_JALR = 0;
-                _FLUSH = 0;
-                _NUMINSTADD = 0;
-            end 
 		end
 
 		//JALR

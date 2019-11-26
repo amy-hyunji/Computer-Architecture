@@ -11,8 +11,13 @@ module FORWARD(
 );
     reg [1:0] _rs1for;
     reg [1:0] _rs2for;
-    assign rs1for = rs1for;
-    assign rs2for = rs2for;
+    initial begin
+        _rs1for <= 2'b00;
+        _rs2for <= 2'b00;
+    end
+
+    assign rs1for = _rs1for;
+    assign rs2for = _rs2for;
 
     always@ (*) begin
         if((rs1ex != 0) && (rs1ex==destmem) && regwritemem) begin

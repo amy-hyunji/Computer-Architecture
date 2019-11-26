@@ -26,7 +26,8 @@ module RISCV_TOP (
 	output wire [31:0] RF_WD,
 	output wire HALT,                   // if set, terminate program
 	output reg [31:0] NUM_INST,         // number of instruction completed
-	output wire [31:0] OUTPUT_PORT      // equal RF_WD this port is used for test
+	output wire [31:0] OUTPUT_PORT,      // equal RF_WD this port is used for test
+    output wire PCMUX
 	);
 
 	assign OUTPUT_PORT = RF_WD;
@@ -42,7 +43,7 @@ module RISCV_TOP (
 
 	// TODO: implement
 
-	wire [31:0] PC_IN, PC_OUT, IMM_IN, IMM_OUT, Be_OUT, ALU_D, BMUX_OUT, CUR_INST, CONDALU_OUT, nPC_IN, ALUOUT_D, Aout_IN, Aout_OUT, Ae_OUT, AMUX_OUT, PCr_OUT, CONDMUX_OUT, PCALU_OUT, nPC_OUT, PCm_OUT, MDRw_OUT, ADDR_OUT, PREV_DEST, FMUX1OUT, FMUX2OUT;
+	wire [31:0] PC_IN, PC_OUT, IMM_IN, IMM_OUT, Be_OUT, ALU_D, BMUX_OUT, CUR_INST, CONDALU_OUT, nPC_IN, ALUOUT_D, Aout_IN, Aout_OUT, Ae_OUT, AMUX_OUT, PCr_OUT, CONDMUX_OUT, PCALU_OUT, nPC_OUT, PCm_OUT, MDRw_OUT, ADDR_OUT, FMUX1OUT, FMUX2OUT;
     wire [31:0] ZERO_EX_MEM, ZERO_MEM_WB, ZERO_WB_OUT;
 	wire [11:0] I_TEMP;
 	wire [6:0] OPCODE, ALUCONTROL_IN, FUNCT7;
@@ -54,10 +55,12 @@ module RISCV_TOP (
     wire [1:0] MREWR_MUX_ID_EX_IN, MREWR_MUX_EX_MEM_IN, MREWR_MUX_MEM_WB_IN, MREWR_MUX_SIG;
     wire D_MEM_WEN_ID_EX_IN, D_MEM_WEN_EX_MEM_IN;
     wire [3:0] D_MEM_BE_ID_EX_IN, D_MEM_BE_EX_MEM_IN;
-    wire [4:0] RS1EX, RS2EX, RDEX, RDMEM, RDWB;
+    wire [4:0] RS1EX, RS2EX, RDID, RDEX, RDMEM, RDWB;
     wire [1:0] FORWARDMUX1, FORWARDMUX2;
     wire D_MEM_CSN_ID_EX_IN, D_MEM_CSN_EX_MEM_IN;
     wire NUMINSTADD, NUMINSTADD_ID_EX_IN, NUMINSTADD_EX_MEM_IN, NUMINSTADD_MEM_WB_IN;
+
+    assign RF_WA1 = RDWB;
 	
 	initial begin
 		I_MEM_ADDR = 0;
@@ -67,13 +70,48 @@ module RISCV_TOP (
 		assign I_MEM_ADDR = I_TEMP;
 	end
 
+	always @ (negedge CLK) begin
+        $display("\n");
+        $display("--start cycle--");
+        $display("----IF-----");
+        $display("IMEMDI: %b", I_MEM_DI);
+        $display("-----ID------");
+        $display("numinstadd: %b",NUMINSTADD_ID_EX_IN);
+        $display("rfra1: %b", RF_RA1);
+        $display("rfra2: %b", RF_RA2);
+        $display("ALU_D: %b", ALU_D);
+        $display("rd: %b", RDID);
+        //$display("amux signal: %b",AMUX_EX_OUT);
+        //$display("amux out: %b", AMUX_OUT);
+        //$display("bmux signal: %b",BMUX_EX_OUT);
+        //$display("bmux out: %b", BMUX_OUT);
+        //$display("alucontrolout :%b", ALUCONTROL_EX_OUT);
+        $display("regwrite: %b", RF_WE_ID_EX_IN);
+        $display("----EX----");
+        $display("forwardmux1 : %b",FORWARDMUX1);
+        $display("forwardmux2 : %b",FORWARDMUX2);
+        $display("fmux1out: %b", FMUX1OUT);
+        $display("fmux2out: %b", FMUX2OUT);
+        $display("forwardmux1: %b",FORWARDMUX1);
+        $display("forwardmux2: %b",FORWARDMUX2);
+        $display("destex: %b",RDEX);
+        $display("r1sex: %b",RS1EX);
+        $display("r2sex: %b",RS2EX);
+        $display("---MEM---");
+        $display("destmem: %b",RDMEM);
+        $display("----WB----");
+        $display("NUMINST: %b",NUM_INST);
+        $display("\n");
+    end
+
+
 	CONTROL control ( //ok
 		.OPCODE(OPCODE),
 		.RSTn(RSTn),
 		.CLK(CLK),
 		.RD1(RF_RA1),
 		.RD2(RF_RA2),
-		.PREV_DEST(PREV_DEST[4:0]), //previous instruction WD
+		.PREV_DEST(RDEX), //previous instruction WD
 		.PREV_REWR_MUX(MREWR_MUX_EX_MEM_IN),
         .ZERO(ZERO),
 		.D_MEM_BE(D_MEM_BE_ID_EX_IN),
@@ -90,7 +128,8 @@ module RISCV_TOP (
 		.IR_WR(IR_WR),
 		.PC_WR(PC_WR),
         .FLUSH(FLUSH),
-        .NUMINSTADD(NUMINSTADD_ID_EX_IN)
+        .NUMINSTADD(NUMINSTADD_ID_EX_IN),
+        .PCMUX(PCMUX)
 	);
 
 	CONTROLREG pc ( //ok
@@ -258,7 +297,7 @@ module RISCV_TOP (
 	);
 
 	ONEBITMUX MPCMUX( //ok
-		.SIGNAL(PC_WR),
+		.SIGNAL(PCMUX),
 		.INPUT1(PCALU_OUT),
 		.INPUT2(nPC_OUT),
 		.OUTPUT(PC_IN)
@@ -314,7 +353,7 @@ module RISCV_TOP (
 		.RS2(RF_RA2),
 		.FUNCT3(FUNCT3),
 		.FUNCT7(FUNCT7),
-		.RD(RF_WA1),
+		.RD(RDID),
 		.CUR_INST(CUR_INST)
 	);
 	/////////////////////////////
@@ -350,12 +389,6 @@ module RISCV_TOP (
 		.OUT_VAL(Be_OUT)
 	);
 
-    REG WRe( //WARNING
-        .CLK(CLK),
-        .IN_VAL({27'b000000000000000000000000000, RF_WA1}),
-        .OUT_VAL(PREV_DEST) //NEED to check if this causes error - is 5bit but is assigned to 32bit
-    );
-
     REG id_ex_zero( //OK
         .CLK(CLK),
         .IN_VAL({31'b0000000000000000000000000000000, FLUSH}),
@@ -376,7 +409,7 @@ module RISCV_TOP (
 
     BIT5REG id_ex_rd(
         .CLK(CLK),
-        .IN_VAL(RF_WA1),
+        .IN_VAL(RDID),
         .OUT_VAL(RDEX)
     );
 	/////////////////////////////
