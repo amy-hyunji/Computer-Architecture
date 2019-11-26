@@ -15,7 +15,7 @@ module ALUCONTROL (
 		_CONTROLOUT = 0;
 	end
 
-	always@ (OPCODE) begin
+	always@ (*) begin
 
 		if (OPCODE == 7'b0100011) //SW
 			_CONTROLOUT = 4'b0000;
