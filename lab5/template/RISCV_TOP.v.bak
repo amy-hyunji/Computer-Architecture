@@ -32,7 +32,7 @@ module RISCV_TOP (
 
 	// TODO: implement
 
-	wire [31:0] PC_IN, PC_OUT, IMM_IN, IMM_OUT, Be_OUT, ALU_D, BMUX_OUT, CUR_INST, CONDALU_OUT, nPC_IN, ALUOUT_D, Aout_IN, Aout_OUT, Ae_OUT, AMUX_OUT, PCr_OUT, CONDMUX_OUT, PCALU_OUT, nPC_OUT, PCm_OUT, MDRw_OUT, ADDR_OUT, FMUX1OUT, FMUX2OUT;
+	wire [31:0] PC_IN, PC_OUT, IMM_IN, IMM_OUT, Be_OUT, ALU_D, BMUX_OUT, CUR_INST, CONDALU_OUT, nPC_IN, ALUOUT_D, Aout_IN, Aout_OUT, Ae_OUT, AMUX_OUT, PCr_OUT, CONDMUX_OUT, PCALU_OUT, PCm_OUT, MDRw_OUT, ADDR_OUT, FMUX1OUT, FMUX2OUT;
     wire [31:0] ZERO_EX_MEM, ZERO_MEM_WB, ZERO_WB_OUT;
 	wire [11:0] I_TEMP;
 	wire [6:0] OPCODE, ALUCONTROL_IN, FUNCT7;
@@ -73,15 +73,24 @@ module RISCV_TOP (
 	end
 
 	always @ (negedge CLK) begin
+	
 	cnt = cnt+1;
         $display("\n");
         $display("--start cycle--");
 	$display("cnt: %d",cnt);
-        $display("IMEMDI: %b", I_MEM_DI);
+	$display("Pc: %b", PC_OUT);
+	$display("PCMUX :%b", PCMUX);
+	$display("PCIN :%b", PC_IN);
+	$display("PCALUOUT :%b", PCALU_OUT);
 	$display("opcode: %b", OPCODE);  
-	$display("funct3: %b", FUNCT3);      
+	//$display("funct3: %b", FUNCT3);      
         $display("----IF-----");
-        $display("IMEMDI: %b", I_MEM_DI);
+	//$display("I_TEMP: %b", I_TEMP);
+	//$display("PCOUT: %b", PC_OUT);
+        //$display("IMEMDI: %b", I_MEM_DI);
+	//$display("IRWRITE: %b", IR_WR);
+	//$display("PCWRITE: %b", PC_WR);
+	//$display("IMEMCSN: %b", I_MEM_CSN);
         $display("-----ID------");
         $display("numinstadd: %b",NUMINSTADD_ID_EX_IN);
 	$display("STALL: %b", ~PC_WR);
@@ -95,27 +104,36 @@ module RISCV_TOP (
         $display("amux out: %b", AMUX_OUT);
         $display("bmux signal: %b",BMUX_EX_OUT);
         $display("bmux out: %b", BMUX_OUT);
+	$display("Beout: %b", Be_OUT);
         $display("alucontrolout :%b", ALUCONTROL_EX_OUT);
         
         //$display("regwrite: %b", RF_WE_ID_EX_IN);
         
-        $display("forwardmux1 : %b",FORWARDMUX1);
-        $display("forwardmux2 : %b",FORWARDMUX2);
-        $display("fmux1out: %b", FMUX1OUT);
-        $display("fmux2out: %b", FMUX2OUT);
-        $display("forwardmux1: %b",FORWARDMUX1);
-        $display("forwardmux2: %b",FORWARDMUX2);
+        //$display("forwardmux1 : %b",FORWARDMUX1);
+        //$display("forwardmux2 : %b",FORWARDMUX2);
+        //$display("fmux1out: %b", FMUX1OUT);
+        //$display("fmux2out: %b", FMUX2OUT);
+        //$display("forwardmux1: %b",FORWARDMUX1);
+        //$display("forwardmux2: %b",FORWARDMUX2);
         
-        $display("destex: %b",RDEX);
+        //$display("destex: %b",RDEX);
         $display("aluoutd: %b", ALUOUT_D);
         $display("r1sex: %b",RS1EX);
         $display("r2sex: %b",RS2EX);
         $display("---MEM---");
         
+	$display("DMEMWEN : %b", D_MEM_WEN);
+	$display("DMEMBE: %b", D_MEM_BE);
+	$display("DMEMDI :%b", D_MEM_DI);
+	$display("DMEMADDR %b", D_MEM_ADDR);
+	$display("DMEMCSN :%b", D_MEM_CSN);
+	$display("DMEMDOUT :%b", D_MEM_DOUT);
         $display("destmem: %b",RDMEM);
         $display("----WB----");
         $display("NUMINST: %b",NUM_INST);
+	$display("outputport: %b", RF_WD);
         $display("\n");
+	
     end
 
 
@@ -189,7 +207,7 @@ module RISCV_TOP (
 
     TWOBITMUX fmux2(
         .SIGNAL(FORWARDMUX2),
-        .INPUT1(BMUX_OUT),
+        .INPUT1(Be_OUT),
         .INPUT2(ALUOUT_D),
         .INPUT3(RF_WD),
         .INPUT4(0),
@@ -303,7 +321,7 @@ module RISCV_TOP (
 		.INPUT1(IMM_OUT),
 		.INPUT2(32'b00000000000000000000000000000100),
 		.INPUT3(32'b00000000000000000000000000000000),
-		.INPUT4(Be_OUT),
+		.INPUT4(FMUX2OUT),
 		.OUTPUT(BMUX_OUT)
 	);
 
@@ -317,7 +335,7 @@ module RISCV_TOP (
 	ONEBITMUX MPCMUX( //ok
 		.SIGNAL(PCMUX),
 		.INPUT1(PCALU_OUT),
-		.INPUT2(nPC_OUT),
+		.INPUT2(nPC_IN),
 		.OUTPUT(PC_IN)
 	);
 	/////////////////////////////
@@ -364,7 +382,7 @@ module RISCV_TOP (
 		.CLK(CLK),
 		.INSTRUCTION(I_MEM_DI),
 		.IRWRITE(IR_WR),
-        .DUMMY(FLUSH),
+        	.DUMMY(FLUSH),
 		.OPCODE(OPCODE),
 		.IMMEDIATE(IMM_IN),
 		.RS1(RF_RA1),
@@ -376,12 +394,6 @@ module RISCV_TOP (
 	);
 	/////////////////////////////
 	
-	//ID/EX pipeline registers//
-	REG nPC( //OK
-		.CLK(CLK),
-		.IN_VAL(nPC_IN),
-		.OUT_VAL(nPC_OUT)
-	);
 
 	BIT1REG halt1reg(
 		.CLK(CLK),

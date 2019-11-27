@@ -135,7 +135,7 @@ module CONTROL (
             _USE_RS1_IN = 1;
             _USE_RS2_IN = 0;
             // detect load data hazard
-            _STALL = ((RD1==PREV_DEST) | (RD2==PREV_DEST)) & (PREV_REWR_MUX==2'b01);  
+            _STALL = (RD1==PREV_DEST) & (PREV_REWR_MUX==2'b01);  
             _FLUSH = ((OPCODE == 7'b1100011)&ZERO) | (OPCODE == 7'b1100111) | (OPCODE == 7'b1101111);
             if (_STALL == 1) begin
                 _ALU_CONTROL = OPCODE;
