@@ -33,14 +33,14 @@ module RISCV_TOP (
 	// TODO: implement
 
 	wire [31:0] PC_IN, PC_OUT, IMM_IN, IMM_OUT, Be_OUT, ALU_D, BMUX_OUT, CUR_INST, CONDALU_OUT, nPC_IN, ALUOUT_D, Aout_IN, Aout_OUT, Ae_OUT, AMUX_OUT, PCr_OUT, CONDMUX_OUT, PCALU_OUT, PCm_OUT, MDRw_OUT, ADDR_OUT, FMUX1OUT, FMUX2OUT;
-    wire [31:0] ZERO_EX_MEM, ZERO_MEM_WB, ZERO_WB_OUT;
+    wire [31:0] ZERO_EX_MEM, ZERO_MEM_WB, ZERO_WB_OUT, RDFORMUXOUT;
 	wire [11:0] I_TEMP;
 	wire [6:0] OPCODE, ALUCONTROL_IN, FUNCT7;
 	wire [3:0] ALUCONTROL_OUT, ALUCONTROL_EX_OUT; 
 	wire [2:0] FUNCT3;
 	wire [1:0] BMUX_EX_IN, BMUX_EX_OUT;
 	wire ISJALR, AMUX_EX_IN, AMUX_EX_OUT, CONDMUX, IR_WR, PC_WR, PREV_REWR_MUX, ZERO, FLUSH;
-    wire RF_WE_ID_EX_IN, RF_WE_EX_MEM_IN, RF_WE_MEM_WB_IN;
+    wire RF_WE_ID_EX_IN, RF_WE_EX_MEM_IN, RF_WE_MEM_WB_IN, RDFORMUXSIG;
     wire [1:0] MREWR_MUX_ID_EX_IN, MREWR_MUX_EX_MEM_IN, MREWR_MUX_MEM_WB_IN, MREWR_MUX_SIG;
     wire D_MEM_WEN_ID_EX_IN, D_MEM_WEN_EX_MEM_IN;
     wire [3:0] D_MEM_BE_ID_EX_IN, D_MEM_BE_EX_MEM_IN;
@@ -95,8 +95,8 @@ module RISCV_TOP (
         $display("numinstadd: %b",NUMINSTADD_ID_EX_IN);
 	$display("STALL: %b", ~PC_WR);
 	$display("FLUSH: %b", FLUSH);
-        //$display("rfra1: %b", RF_RA1);
-        //$display("rfra2: %b", RF_RA2);
+        $display("rfra1: %b", RF_RA1);
+        $display("rfra2: %b", RF_RA2);
         $display("ALU_D: %b", ALU_D);
         
         $display("rd: %b", RDID);
@@ -105,16 +105,19 @@ module RISCV_TOP (
         $display("bmux signal: %b",BMUX_EX_OUT);
         $display("bmux out: %b", BMUX_OUT);
 	$display("Beout: %b", Be_OUT);
-        $display("alucontrolout :%b", ALUCONTROL_EX_OUT);
-        
+        $display("alucontrol ex :%b", ALUCONTROL_EX_OUT);
+	$display("alucontrol id :%b",ALUCONTROL_OUT);
+	$display("zero: %b", ZERO);
+	$display("rs1 id: %b", RF_RD1);
+	$display("rs2 id: %b", RF_RD2);        
         //$display("regwrite: %b", RF_WE_ID_EX_IN);
         
-        //$display("forwardmux1 : %b",FORWARDMUX1);
-        //$display("forwardmux2 : %b",FORWARDMUX2);
-        //$display("fmux1out: %b", FMUX1OUT);
-        //$display("fmux2out: %b", FMUX2OUT);
-        //$display("forwardmux1: %b",FORWARDMUX1);
-        //$display("forwardmux2: %b",FORWARDMUX2);
+        $display("forwardmux1 : %b",FORWARDMUX1);
+        $display("forwardmux2 : %b",FORWARDMUX2);
+        $display("fmux1out: %b", FMUX1OUT);
+        $display("fmux2out: %b", FMUX2OUT);
+        $display("forwardmux1: %b",FORWARDMUX1);
+        $display("forwardmux2: %b",FORWARDMUX2);
         
         //$display("destex: %b",RDEX);
         $display("aluoutd: %b", ALUOUT_D);
@@ -130,7 +133,7 @@ module RISCV_TOP (
 	$display("DMEMDOUT :%b", D_MEM_DOUT);
         $display("destmem: %b",RDMEM);
         $display("----WB----");
-        $display("NUMINST: %b",NUM_INST);
+        $display("NUMINST: %d",NUM_INST);
 	$display("outputport: %b", RF_WD);
         $display("\n");
 	
@@ -163,7 +166,8 @@ module RISCV_TOP (
         .NUMINSTADD(NUMINSTADD_ID_EX_IN),
         .PCMUX(PCMUX),
         .USE_RS1_IN(USE_RS1_IN),
-        .USE_RS2_IN(USE_RS2_IN)
+        .USE_RS2_IN(USE_RS2_IN),
+	.RDFORMUXSIG(RDFORMUXSIG)
 	);
 
 	CONTROLREG pc ( //ok
@@ -184,35 +188,42 @@ module RISCV_TOP (
     // forwarding
     // ------------------------
     FORWARD forward(
-        .rs1ex(RS1EX),
-        .rs2ex(RS2EX),
-        .destmem(RDMEM),
-        .destwb(RDWB),
-        .regwritemem(RF_WE_MEM_WB_IN),
-        .regwritewb(RF_WE),
-        .users1(USE_RS1_OUT),
-        .users2(USE_RS2_OUT),
+        .rs1ex(RF_RA1),
+        .rs2ex(RF_RA2),
+        .destmem(RDEX),
+        .destwb(RDMEM),
+        .regwritemem(RF_WE_EX_MEM_IN),
+        .regwritewb(RF_WE_MEM_WB_IN),
+        .users1(USE_RS1_IN),
+        .users2(USE_RS2_IN),
         .rs1for(FORWARDMUX1),
         .rs2for(FORWARDMUX2)
     );
 
     TWOBITMUX fmux1(
         .SIGNAL(FORWARDMUX1),
-        .INPUT1(AMUX_OUT),
-        .INPUT2(ALUOUT_D),
-        .INPUT3(RF_WD),
+        .INPUT1(RF_RD1),
+        .INPUT2(ALU_D),
+        .INPUT3(RDFORMUXOUT),
         .INPUT4(0),
         .OUTPUT(FMUX1OUT)
     );
 
     TWOBITMUX fmux2(
         .SIGNAL(FORWARDMUX2),
-        .INPUT1(Be_OUT),
-        .INPUT2(ALUOUT_D),
-        .INPUT3(RF_WD),
+        .INPUT1(RF_RD2),
+        .INPUT2(ALU_D),
+        .INPUT3(RDFORMUXOUT),
         .INPUT4(0),
         .OUTPUT(FMUX2OUT)
     );
+
+    ONEBITMUX rdformux(
+	.SIGNAL(RDFORMUXSIG),
+	.INPUT1(D_MEM_DI),
+	.INPUT2(ALUOUT_D),
+	.OUTPUT(RDFORMUXOUT)
+);
 
 
     // ------------------------
@@ -321,7 +332,7 @@ module RISCV_TOP (
 		.INPUT1(IMM_OUT),
 		.INPUT2(32'b00000000000000000000000000000100),
 		.INPUT3(32'b00000000000000000000000000000000),
-		.INPUT4(FMUX2OUT),
+		.INPUT4(Be_OUT),
 		.OUTPUT(BMUX_OUT)
 	);
 
@@ -351,8 +362,8 @@ module RISCV_TOP (
 
 	ALU REGALU( //ok
 		.OP(ALUCONTROL_EX_OUT),
-		.A(FMUX1OUT),
-		.B(FMUX2OUT),
+		.A(AMUX_OUT),
+		.B(BMUX_OUT),
 		.Out(ALU_D)
 	);
 
@@ -365,8 +376,8 @@ module RISCV_TOP (
 
 	EQUAL equal( //OK
 		.OP(ALUCONTROL_OUT),
-		.A(RF_RD1),
-		.B(RF_RD2),
+		.A(FMUX1OUT),
+		.B(FMUX2OUT),
 		.Zero(ZERO) 
 	);
 	/////////////////////////////
@@ -427,13 +438,13 @@ module RISCV_TOP (
 
 	REG Ae( //OK
 		.CLK(CLK),
-		.IN_VAL(RF_RD1),
+		.IN_VAL(FMUX1OUT),
 		.OUT_VAL(Ae_OUT)
 	);
 
 	REG Be( //OK
 		.CLK(CLK),
-		.IN_VAL(RF_RD2),
+		.IN_VAL(FMUX2OUT),
 		.OUT_VAL(Be_OUT)
 	);
 
