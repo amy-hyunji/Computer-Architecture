@@ -60,9 +60,11 @@ module RISCV_TOP (
 	end
 
 	// Only allow for NUM_INST
+	/*
 	always @ (negedge CLK) begin
-		if (RSTn) NUM_INST <= NUM_INST + NUMINSTADD;
+		if (RSTn) NUM_INST = NUM_INST + NUMINSTADD;
 	end
+	*/
 	
 	initial begin
 		I_MEM_ADDR = 0;
@@ -74,15 +76,17 @@ module RISCV_TOP (
 	end
 
 	always @ (negedge CLK) begin
-	
+	if(RSTn) NUM_INST = NUM_INST + NUMINSTADD;
 	cnt = cnt+1;
         $display("\n");
         $display("--start cycle--");
 	$display("I mem di %h",I_MEM_DI);
 	$display("cnt: %d",cnt);
 	$display("Pc: %b", PC_OUT);
+	$display("NPCIN %b", nPC_IN);
 	$display("PCMUX :%b", PCMUX);
 	$display("PCIN :%b", PC_IN);
+	$display("condmux out :%b", CONDMUX_OUT);
 	$display("PCALUOUT :%b", PCALU_OUT);
 	$display("opcode: %b", OPCODE);  
 	//$display("funct3: %b", FUNCT3);      
@@ -95,7 +99,8 @@ module RISCV_TOP (
 	//$display("IMEMCSN: %b", I_MEM_CSN);
         $display("-----ID------");
 	$display("cur inst: %b", CUR_INST);
-        $display("numinstadd: %b",NUMINSTADD_ID_EX_IN);
+        $display("numinstadd id: %b",NUMINSTADD_ID_EX_IN);
+	$display("numinstadd ex: %b", NUMINSTADD_EX_MEM_IN);
 	$display("STALL: %b", ~PC_WR);
 	$display("FLUSH: %b", FLUSH);
         $display("rfra1: %b", RF_RA1);

@@ -49,12 +49,9 @@ module INSTREG(
 
 		always@ (posedge CLK) begin
             if (IRWRITE) begin
-                if (DUMMY) TEMP_INST <= _DUMMY;
-                else TEMP_INST <= INSTRUCTION;
-            end
-		end
-
-		always@ (TEMP_INST) begin
+                if (DUMMY) TEMP_INST = _DUMMY;
+                else TEMP_INST = INSTRUCTION;
+           end
 			 _RS1 = TEMP_INST[19:15];
 			 _RS2 = TEMP_INST[24:20];
 			 _RD = TEMP_INST[11:7];
@@ -103,9 +100,9 @@ module INSTREG(
 				  if (_IMMEDIATE[12] == 0) _IMMEDIATE[31:13] = 0;
 				  else _IMMEDIATE[31:13] = 19'b1111111111111111111;
 			end
-            7'b0000000: begin // DUMMY
-                _IMMEDIATE = 0;
-            end
+            		7'b0000000: begin // DUMMY
+               			 _IMMEDIATE = 0;
+            			end
 		 endcase
 		end
 endmodule

@@ -83,8 +83,10 @@ module RISCV_TOP (
 	$display("I mem di %h",I_MEM_DI);
 	$display("cnt: %d",cnt);
 	$display("Pc: %b", PC_OUT);
+	$display("NPCIN %b", nPC_IN);
 	$display("PCMUX :%b", PCMUX);
 	$display("PCIN :%b", PC_IN);
+	$display("condmux out :%b", CONDMUX_OUT);
 	$display("PCALUOUT :%b", PCALU_OUT);
 	$display("opcode: %b", OPCODE);  
 	//$display("funct3: %b", FUNCT3);      
@@ -408,8 +410,10 @@ module RISCV_TOP (
 	/////////////////////////////
 
 	//IF/ID pipeline registers//
-	REG PCr ( //ok
+	CONTROLREG PCr ( //ok
 		.CLK(CLK),
+		.WREN(PC_WR),
+		.RSTn(RSTn),
 		.IN_VAL(PC_OUT),
 		.OUT_VAL(PCr_OUT)
 	);
