@@ -191,7 +191,7 @@ module CONTROL (
             _IS_JALR = 0;
             _CONDMUX = 0;
             _NUMINSTADD = 1;
-            _PCMUX = 1;
+            _PCMUX = ZERO;
             _USE_RS1_IN = 1;
             _USE_RS2_IN = 1;
 	    _RDFORMUXSIG = 1;

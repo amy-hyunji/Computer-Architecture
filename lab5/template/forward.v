@@ -1,8 +1,10 @@
 module FORWARD(
     input wire [4:0] rs1ex,
     input wire [4:0] rs2ex,
+    input wire [4:0] destex,
     input wire [4:0] destmem,
     input wire [4:0] destwb,
+    input wire regwriteex,
     input wire regwritemem,
     input wire regwritewb,
     input wire users1,
@@ -22,20 +24,26 @@ module FORWARD(
     assign rs2for = _rs2for;
 
     always@ (*) begin
-        if((rs1ex != 0) && (rs1ex==destmem) && regwritemem && users1) begin
-            _rs1for = 2'b01; // forward from mem stage
+        if((rs1ex != 0) && (rs1ex==destex) && regwriteex && users1) begin
+            _rs1for = 2'b01; // forward from ex stage
             end
-        else if((rs1ex != 0) && (rs1ex==destwb) && regwritewb && users1) begin
-            _rs1for = 2'b10; // forward from wb stage
+        else if((rs1ex != 0) && (rs1ex==destmem) && regwritemem && users1) begin
+            _rs1for = 2'b10; // forward from mem stage
             end
+	else if((rs1ex != 0) && (rs1ex==destwb) && regwritewb && users1) begin
+	    _rs1for = 2'b11; // forward from wb stage
+	    end
         else _rs1for = 2'b00; // no forwarding
 
-        if((rs2ex != 0) && (rs2ex==destmem) && regwritemem && users2) begin
-            _rs2for = 2'b01; // forward from mem stage
+        if((rs2ex != 0) && (rs2ex==destex) && regwriteex && users2) begin
+            _rs2for = 2'b01; // forward from ex stage
             end
-        else if((rs2ex != 0) && (rs2ex==destwb) && regwritewb && users2) begin
-            _rs2for = 2'b10; // forward from wb stage
+        else if((rs2ex != 0) && (rs2ex==destmem) && regwritemem && users2) begin
+            _rs2for = 2'b10; // forward from mem stage
             end
+	else if((rs2ex != 0) && (rs2ex==destwb) && regwritewb && users2) begin
+	    _rs2for = 2'b11; // forward from wb stage
+	    end
         else _rs2for = 2'b00; // no forwarding
     end
 
