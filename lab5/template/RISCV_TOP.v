@@ -61,11 +61,9 @@ module RISCV_TOP (
 	end
 
 	// Only allow for NUM_INST
-	/*
 	always @ (negedge CLK) begin
 		if (RSTn) NUM_INST = NUM_INST + NUMINSTADD;
 	end
-	*/
 	
 	initial begin
 		I_MEM_ADDR = 0;
@@ -76,88 +74,6 @@ module RISCV_TOP (
 		assign I_MEM_ADDR = I_TEMP;
 	end
 
-	always @ (negedge CLK) begin
-	if(RSTn) NUM_INST = NUM_INST + NUMINSTADD;
-	cnt = cnt+1;
-        $display("\n");
-        $display("--start cycle--");
-	$display("I mem di %h",I_MEM_DI);
-	$display("cnt: %d",cnt);
-	$display("Pc: %b", PC_OUT);
-	$display("NPCIN %b", nPC_IN);
-	$display("PCMUX :%b", PCMUX);
-	$display("PCIN :%b", PC_IN);
-	$display("condmux out :%b", CONDMUX_OUT);
-	$display("PCALUOUT :%b", PCALU_OUT);
-	$display("opcode: %b", OPCODE);  
-	//$display("funct3: %b", FUNCT3);      
-        $display("----IF-----");
-	//$display("I_TEMP: %b", I_TEMP);
-	//$display("PCOUT: %b", PC_OUT);
-        //$display("IMEMDI: %b", I_MEM_DI);
-	//$display("IRWRITE: %b", IR_WR);
-	//$display("PCWRITE: %b", PC_WR);
-	//$display("IMEMCSN: %b", I_MEM_CSN);
-        $display("-----ID------");
-	$display("cur inst: %b", CUR_INST);
-        $display("numinstadd id: %b",NUMINSTADD_ID_EX_IN);
-	$display("numinstadd ex: %b", NUMINSTADD_EX_MEM_IN);
-	$display("STALL: %b", ~PC_WR);
-	$display("FLUSH: %b", FLUSH);
-        $display("rfra1: %b", RF_RA1);
-        $display("rfra2: %b", RF_RA2);
-	$display("rfrd1: %b", RF_RD1);
-	$display("rfrd2: %b", RF_RD2);
-        $display("ALU_D: %b", ALU_D);
-	$display("users1 :%b", USE_RS1_IN);
-	$display("users2: %b", USE_RS2_IN);
-	$display("destex: %b", RDEX);
-	$display("dest mem: %b", RDMEM);
-        $display("regwrite ex: %b",RF_WE_EX_MEM_IN);
-        $display("rd: %b", RDID);
-        $display("amux signal: %b",AMUX_EX_OUT);
-        $display("amux out: %b", AMUX_OUT);
-        $display("bmux signal: %b",BMUX_EX_OUT);
-        $display("bmux out: %b", BMUX_OUT);
-	$display("Beout: %b", Be_OUT);
-        $display("alucontrol ex :%b", ALUCONTROL_EX_OUT);
-	$display("alucontrol id :%b",ALUCONTROL_OUT);
-	$display("zero: %b", ZERO);
-	$display("rs1 id: %b", RF_RD1);
-	$display("rs2 id: %b", RF_RD2);        
-        //$display("regwrite: %b", RF_WE_ID_EX_IN);
-        
-        $display("forwardmux1 : %b",FORWARDMUX1);
-        $display("forwardmux2 : %b",FORWARDMUX2);
-        $display("fmux1out: %b", FMUX1OUT);
-        $display("fmux2out: %b", FMUX2OUT);
-        $display("forwardmux1: %b",FORWARDMUX1);
-        $display("forwardmux2: %b",FORWARDMUX2);
-        
-        //$display("destex: %b",RDEX);
-        $display("aluoutd: %b", ALUOUT_D);
-        $display("r1sex: %b",RS1EX);
-        $display("r2sex: %b",RS2EX);
-        $display("---MEM---");
-        
-	$display("DMEMWEN : %b", D_MEM_WEN);
-	$display("DMEMBE: %b", D_MEM_BE);
-	$display("DMEMDI :%b", D_MEM_DI);
-	$display("DMEMADDR %b", D_MEM_ADDR);
-	$display("DMEMCSN :%b", D_MEM_CSN);
-	$display("DMEMDOUT :%b", D_MEM_DOUT);
-        $display("destmem: %b",RDMEM);
-        $display("----WB----");
-        $display("NUMINST: %d",NUM_INST);
-	$display("outputport: %b", RF_WD);
-	$display("regwrite: %b", RF_WE);
-	$display("regwrite mem: %b", RF_WE_MEM_WB_IN);
-	$display("regwrite ex: %b", RF_WE_EX_MEM_IN);
-	$display("regwrite id: %b", RF_WE_ID_EX_IN);
-	$display("writing at: %b", RF_WA1);
-        $display("\n");
-	
-    end
 
 
 	CONTROL control ( //ok
