@@ -84,7 +84,7 @@ module CONTROL (
 				 _ALU_CONTROL = OPCODE;
 				 _RE_WE = 0;
 				 _C_MEM_WEN = 1;
-				 _C_MEM_REN = 1;
+				_C_MEM_REN = 1;
 				 _IS_JALR = 0;
 				 _FLUSH = 0;
 				 _NUMINSTADD = 0;
@@ -114,7 +114,7 @@ module CONTROL (
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
                 _C_MEM_WEN = 1;
-					 _C_MEM_REN = 1;
+                _C_MEM_REN = 1;
                 _IS_JALR = 0;
                 _FLUSH = 0;
                 _NUMINSTADD = 0;
@@ -144,7 +144,7 @@ module CONTROL (
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
                 _C_MEM_WEN = 1;
-					 _C_MEM_REN = 1;
+                _C_MEM_REN = 1;
                 _IS_JALR = 0;
                 _FLUSH = 0;
                 _NUMINSTADD = 0;
@@ -174,7 +174,7 @@ module CONTROL (
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
                 _C_MEM_WEN = 1;
-					 _C_MEM_REN = 1;
+                _C_MEM_REN = 1;
                 _IS_JALR = 0;
                 _FLUSH = 0;
                 _NUMINSTADD = 0;
@@ -205,7 +205,7 @@ module CONTROL (
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
                 _C_MEM_WEN = 1;
-					 _C_MEM_REN = 1;
+                _C_MEM_REN = 1;
                 _IS_JALR = 0;
                 _FLUSH = 0;
                 _NUMINSTADD = 0;
@@ -257,7 +257,7 @@ module CONTROL (
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
                 _C_MEM_WEN = 1;
-					 _C_MEM_REN = 1;
+                _C_MEM_REN = 1;
                 _IS_JALR = 0;
                 _FLUSH = 0;
                 _NUMINSTADD = 0;

@@ -19,8 +19,8 @@ module MEMREG (
 	assign C_MEM_CSN_OUT = _C_MEM_CSN;
 
     initial begin
-        _C_MEM_WEN = 1;
-		  _C_MEM_REN = 1;
+        _C_MEM_WEN = 0;
+		  _C_MEM_REN = 0;
 	_C_MEM_CSN = 0;
     end
 

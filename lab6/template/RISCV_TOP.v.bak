@@ -41,30 +41,52 @@ module RISCV_TOP (
 	wire [1:0] BMUX_EX_IN, BMUX_EX_OUT;
 	wire ISJALR, AMUX_EX_IN, AMUX_EX_OUT, CONDMUX, IR_WR, PC_WR, PREV_REWR_MUX, ZERO, FLUSH;
     wire RF_WE_ID_EX_IN, RF_WE_EX_MEM_IN, RF_WE_MEM_WB_IN;
-    wire RDMUX_ID_EX_IN, RDMUX_EX_MEM_IN, RDFORMUXSIG, RDMUXDUMMY;
+    wire RDMUX_ID_EX_IN, RDMUX_EX_MEM_IN, RDFORMUXSIG;
     wire [1:0] MREWR_MUX_ID_EX_IN, MREWR_MUX_EX_MEM_IN, MREWR_MUX_MEM_WB_IN, MREWR_MUX_SIG;
-    wire D_MEM_WEN_ID_EX_IN, D_MEM_WEN_EX_MEM_IN;
-    wire [3:0] D_MEM_BE_ID_EX_IN, D_MEM_BE_EX_MEM_IN;
+    wire C_MEM_WEN_ID_EX_IN, C_MEM_WEN_EX_MEM_IN;
     wire [4:0] RS1EX, RS2EX, RDID, RDEX, RDMEM, RDWB;
     wire [1:0] FORWARDMUX1, FORWARDMUX2;
     wire D_MEM_CSN_ID_EX_IN, D_MEM_CSN_EX_MEM_IN;
     wire NUMINSTADD, NUMINSTADD_ID_EX_IN, NUMINSTADD_EX_MEM_IN, NUMINSTADD_MEM_WB_IN, PCMUX, USE_RS1_IN, USE_RS2_IN, USE_RS1_OUT, USE_RS2_OUT;
     wire HALT_ID_EX_IN, HALT_EX_MEM_IN, HALT_MEM_WB_IN;
-
+	
+	 //FOR CACHE//
+	 wire [31:0] C_MEM_DI, C_MEM_DOUT;
+	 wire C_MEM_WEN, C_MEM_REN, CACHE_STALL;
+	 wire [11:0] C_MEM_ADDR;
+	 wire C_MEM_REN_ID_EX_IN, C_MEM_REN_EX_MEM_IN;
+ 	 wire C_MEM_CSN_ID_EX_IN, C_MEM_CSN_EX_MEM_IN, C_MEM_CSN;
     reg [31:0] cnt;
     assign RF_WA1 = RDWB;
-	assign OUTPUT_PORT = RF_WD;
+	 assign OUTPUT_PORT = RF_WD;
 
-	initial begin
+	 initial begin
 		NUM_INST <= 0;
-	end
+	 end
 
-	// Only allow for NUM_INST
-	/*
+	 always@ (posedge CLK) begin
+		cnt = cnt+1;
+		$display("------------");
+		$display("cnt : %d",cnt);
+		$display("opcode: %b", OPCODE);
+		$display("cmemcsn %b",C_MEM_CSN);
+		$display("dmemcsn %b",D_MEM_CSN);
+		$display("RSTN: %b", RSTn);
+		$display("output port: %h", OUTPUT_PORT);
+		$display("cache stall: %b", CACHE_STALL);
+		$display("CMEMDI %b", C_MEM_DI);
+		$display("C MEM WEN at id %b", C_MEM_WEN_ID_EX_IN);
+		$display("C MEM REN at id %b", C_MEM_REN_ID_EX_IN);
+		$display("C MEM WEN at mem %b", C_MEM_WEN);
+		$display("C MEM REN at mem %b", C_MEM_REN);
+		$display("D MEM WEN %b", D_MEM_WEN);
+		$display("numinst is %d", NUM_INST);
+	 end
+
+	 	// Only allow for NUM_INST
 	always @ (negedge CLK) begin
 		if (RSTn) NUM_INST = NUM_INST + NUMINSTADD;
 	end
-	*/
 	
 	initial begin
 		I_MEM_ADDR = 0;
@@ -75,89 +97,6 @@ module RISCV_TOP (
 		assign I_MEM_ADDR = I_TEMP;
 	end
 
-	always @ (negedge CLK) begin
-	if(RSTn) NUM_INST = NUM_INST + NUMINSTADD;
-	cnt = cnt+1;
-        $display("\n");
-        $display("--start cycle--");
-	$display("I mem di %h",I_MEM_DI);
-	$display("cnt: %d",cnt);
-	$display("Pc: %b", PC_OUT);
-	$display("NPCIN %b", nPC_IN);
-	$display("PCMUX :%b", PCMUX);
-	$display("PCIN :%b", PC_IN);
-	$display("condmux out :%b", CONDMUX_OUT);
-	$display("PCALUOUT :%b", PCALU_OUT);
-	$display("opcode: %b", OPCODE);  
-	//$display("funct3: %b", FUNCT3);      
-        $display("----IF-----");
-	//$display("I_TEMP: %b", I_TEMP);
-	//$display("PCOUT: %b", PC_OUT);
-        //$display("IMEMDI: %b", I_MEM_DI);
-	//$display("IRWRITE: %b", IR_WR);
-	//$display("PCWRITE: %b", PC_WR);
-	//$display("IMEMCSN: %b", I_MEM_CSN);
-        $display("-----ID------");
-	$display("cur inst: %b", CUR_INST);
-        $display("numinstadd id: %b",NUMINSTADD_ID_EX_IN);
-	$display("numinstadd ex: %b", NUMINSTADD_EX_MEM_IN);
-	$display("STALL: %b", ~PC_WR);
-	$display("FLUSH: %b", FLUSH);
-        $display("rfra1: %b", RF_RA1);
-        $display("rfra2: %b", RF_RA2);
-	$display("rfrd1: %b", RF_RD1);
-	$display("rfrd2: %b", RF_RD2);
-        $display("ALU_D: %b", ALU_D);
-	$display("users1 :%b", USE_RS1_IN);
-	$display("users2: %b", USE_RS2_IN);
-	$display("destex: %b", RDEX);
-	$display("dest mem: %b", RDMEM);
-        $display("regwrite ex: %b",RF_WE_EX_MEM_IN);
-        $display("rd: %b", RDID);
-        $display("amux signal: %b",AMUX_EX_OUT);
-        $display("amux out: %b", AMUX_OUT);
-        $display("bmux signal: %b",BMUX_EX_OUT);
-        $display("bmux out: %b", BMUX_OUT);
-	$display("Beout: %b", Be_OUT);
-        $display("alucontrol ex :%b", ALUCONTROL_EX_OUT);
-	$display("alucontrol id :%b",ALUCONTROL_OUT);
-	$display("zero: %b", ZERO);
-	$display("rs1 id: %b", RF_RD1);
-	$display("rs2 id: %b", RF_RD2);        
-        //$display("regwrite: %b", RF_WE_ID_EX_IN);
-        
-        $display("forwardmux1 : %b",FORWARDMUX1);
-        $display("forwardmux2 : %b",FORWARDMUX2);
-        $display("fmux1out: %b", FMUX1OUT);
-        $display("fmux2out: %b", FMUX2OUT);
-        $display("forwardmux1: %b",FORWARDMUX1);
-        $display("forwardmux2: %b",FORWARDMUX2);
-        
-        //$display("destex: %b",RDEX);
-        $display("aluoutd: %b", ALUOUT_D);
-        $display("r1sex: %b",RS1EX);
-        $display("r2sex: %b",RS2EX);
-        $display("---MEM---");
-        
-	$display("DMEMWEN : %b", D_MEM_WEN);
-	$display("DMEMBE: %b", D_MEM_BE);
-	$display("DMEMDI :%b", D_MEM_DI);
-	$display("DMEMADDR %b", D_MEM_ADDR);
-	$display("DMEMCSN :%b", D_MEM_CSN);
-	$display("DMEMDOUT :%b", D_MEM_DOUT);
-        $display("destmem: %b",RDMEM);
-        $display("----WB----");
-        $display("NUMINST: %d",NUM_INST);
-	$display("outputport: %b", RF_WD);
-	$display("regwrite: %b", RF_WE);
-	$display("regwrite mem: %b", RF_WE_MEM_WB_IN);
-	$display("regwrite ex: %b", RF_WE_EX_MEM_IN);
-	$display("regwrite id: %b", RF_WE_ID_EX_IN);
-	$display("writing at: %b", RF_WA1);
-        $display("\n");
-	
-    end
-
 
 	CONTROL control ( //ok
 		.OPCODE(OPCODE),
@@ -167,11 +106,11 @@ module RISCV_TOP (
 		.RD2(RF_RA2),
 		.PREV_DEST(RDEX), //previous instruction WD
 		.PREV_REWR_MUX(MREWR_MUX_EX_MEM_IN),
-        .ZERO(ZERO),
-		.D_MEM_BE(D_MEM_BE_ID_EX_IN),
+      .ZERO(ZERO),
 		.RF_WE(RF_WE_ID_EX_IN),
-		.D_MEM_WEN(D_MEM_WEN_ID_EX_IN),
-		.D_MEM_CSN(D_MEM_CSN_ID_EX_IN),
+		.C_MEM_WEN(C_MEM_WEN_ID_EX_IN),
+		.C_MEM_REN(C_MEM_REN_ID_EX_IN),
+		.C_MEM_CSN(C_MEM_CSN_ID_EX_IN),
 		.I_MEM_CSN(I_MEM_CSN),
 		.REWR_MUX(MREWR_MUX_ID_EX_IN),
 		.AMUX(AMUX_EX_IN),
@@ -181,17 +120,17 @@ module RISCV_TOP (
 		.BMUX(BMUX_EX_IN),
 		.IR_WR(IR_WR),
 		.PC_WR(PC_WR),
-        .FLUSH(FLUSH),
-        .NUMINSTADD(NUMINSTADD_ID_EX_IN),
-        .PCMUX(PCMUX),
-        .USE_RS1_IN(USE_RS1_IN),
-        .USE_RS2_IN(USE_RS2_IN),
-	.RDFORMUXSIG(RDMUX_ID_EX_IN)
+      .FLUSH(FLUSH),
+      .NUMINSTADD(NUMINSTADD_ID_EX_IN),
+      .PCMUX(PCMUX),
+      .USE_RS1_IN(USE_RS1_IN),
+      .USE_RS2_IN(USE_RS2_IN),
+		.RDFORMUXSIG(RDMUX_ID_EX_IN)
 	);
 
 	CONTROLREG pc ( //ok
 		.CLK(CLK),
-		.WREN(PC_WR),
+		.WREN(PC_WR & (~CACHE_STALL)),
 		.RSTn(RSTn),
 		.IN_VAL(PC_IN),
 		.OUT_VAL(PC_OUT)
@@ -204,46 +143,63 @@ module RISCV_TOP (
 		.CONTROLOUT(ALUCONTROL_OUT)
 	);
 
+	CACHE cache (
+		.CLK(CLK),
+		.CSN(C_MEM_CSN),
+		.C_MEM_DI(C_MEM_DOUT),
+		.C_MEM_WEN(C_MEM_WEN),
+		.C_MEM_REN(C_MEM_REN),
+		.C_MEM_ADDR(C_MEM_ADDR),
+		.D_MEM_DI(D_MEM_DI),
+		.D_MEM_DOUT(D_MEM_DOUT),
+		.C_MEM_DOUT(C_MEM_DI),
+		.D_MEM_ADDR(D_MEM_ADDR),
+		.D_MEM_WEN(D_MEM_WEN),
+		.D_MEM_BE(D_MEM_BE),
+		.D_MEM_CSN(D_MEM_CSN),
+		.CACHE_STALL(CACHE_STALL)
+	);
+
     // forwarding
     // ------------------------
     FORWARD forward(
-        .rs1ex(RF_RA1),
-        .rs2ex(RF_RA2),
-        .destex(RDEX),
-        .destmem(RDMEM),
-	.destwb(RDWB),
-	.regwriteex(RF_WE_EX_MEM_IN),
-        .regwritemem(RF_WE_MEM_WB_IN),
-        .regwritewb(RF_WE),
-        .users1(USE_RS1_IN),
-        .users2(USE_RS2_IN),
-        .rs1for(FORWARDMUX1),
-        .rs2for(FORWARDMUX2)
+	  .rs1ex(RF_RA1),
+	  .rs2ex(RF_RA2),
+	  .destex(RDEX),
+	  .destmem(RDMEM),
+	  .destwb(RDWB),
+	  .regwriteex(RF_WE_EX_MEM_IN),
+	  .regwritemem(RF_WE_MEM_WB_IN),
+	  .regwritewb(RF_WE),
+	  .users1(USE_RS1_IN),
+	  .users2(USE_RS2_IN),
+	  .rs1for(FORWARDMUX1),
+	  .rs2for(FORWARDMUX2)
     );
 
     TWOBITMUX fmux1(
-        .SIGNAL(FORWARDMUX1),
-        .INPUT1(RF_RD1),
-        .INPUT2(ALU_D),
-        .INPUT3(RDFORMUXOUT),
-        .INPUT4(RF_WD),
-        .OUTPUT(FMUX1OUT)
+	  .SIGNAL(FORWARDMUX1),
+	  .INPUT1(RF_RD1),
+	  .INPUT2(ALU_D),
+	  .INPUT3(RDFORMUXOUT),
+	  .INPUT4(RF_WD),
+	  .OUTPUT(FMUX1OUT)
     );
 
-    TWOBITMUX fmux2(
-        .SIGNAL(FORWARDMUX2),
-        .INPUT1(RF_RD2),
-        .INPUT2(ALU_D),
-        .INPUT3(RDFORMUXOUT),
-        .INPUT4(RF_WD),
-        .OUTPUT(FMUX2OUT)
+	TWOBITMUX fmux2(
+		  .SIGNAL(FORWARDMUX2),
+		  .INPUT1(RF_RD2),
+		  .INPUT2(ALU_D),
+		  .INPUT3(RDFORMUXOUT),
+		  .INPUT4(RF_WD),
+		  .OUTPUT(FMUX2OUT)
     );
 
     ONEBITMUX rdformux(
-	.SIGNAL(RDFORMUXSIG),
-	.INPUT1(D_MEM_DI),
-	.INPUT2(ALUOUT_D),
-	.OUTPUT(RDFORMUXOUT)
+		.SIGNAL(RDFORMUXSIG),
+		.INPUT1(C_MEM_DI),
+		.INPUT2(ALUOUT_D),
+		.OUTPUT(RDFORMUXOUT)
 );
 
 
@@ -254,62 +210,66 @@ module RISCV_TOP (
         .AMUX_IN(AMUX_EX_IN),
         .BMUX_IN(BMUX_EX_IN),
         .CLK(CLK),
+		  .ENABLE(~CACHE_STALL),
         .ALUCONTROLOUT_OUT(ALUCONTROL_EX_OUT),
         .AMUX_OUT(AMUX_EX_OUT),
         .BMUX_OUT(BMUX_EX_OUT)
     );
 
     MEMREG id_ex_memreg ( //OK
-        .D_MEM_WEN_IN(D_MEM_WEN_ID_EX_IN),
-        .D_MEM_BE_IN(D_MEM_BE_ID_EX_IN),
-        .D_MEM_CSN_IN(D_MEM_CSN_ID_EX_IN),
+        .C_MEM_WEN_IN(C_MEM_WEN_ID_EX_IN),
+	.C_MEM_CSN_IN(C_MEM_CSN_ID_EX_IN),
+		  .C_MEM_REN_IN(C_MEM_REN_ID_EX_IN),
         .CLK(CLK),
-        .D_MEM_WEN_OUT(D_MEM_WEN_EX_MEM_IN),
-        .D_MEM_BE_OUT(D_MEM_BE_EX_MEM_IN),
-        .D_MEM_CSN_OUT(D_MEM_CSN_EX_MEM_IN)
+		  .ENABLE(~CACHE_STALL),
+        .C_MEM_WEN_OUT(C_MEM_WEN_EX_MEM_IN),
+	.C_MEM_CSN_OUT(C_MEM_CSN_EX_MEM_IN),
+		  .C_MEM_REN_OUT(C_MEM_REN_EX_MEM_IN)
     );
 
     MEMREG ex_mem_memreg ( //ok
-        .D_MEM_WEN_IN(D_MEM_WEN_EX_MEM_IN),
-        .D_MEM_BE_IN(D_MEM_BE_EX_MEM_IN),
-        .D_MEM_CSN_IN(D_MEM_CSN_EX_MEM_IN),
+        .C_MEM_WEN_IN(C_MEM_WEN_EX_MEM_IN),
+	.C_MEM_CSN_IN(C_MEM_CSN_EX_MEM_IN),
+		  .C_MEM_REN_IN(C_MEM_REN_EX_MEM_IN),
         .CLK(CLK),
-        .D_MEM_WEN_OUT(D_MEM_WEN),
-        .D_MEM_BE_OUT(D_MEM_BE),
-        .D_MEM_CSN_OUT(D_MEM_CSN)
+		  .ENABLE(~CACHE_STALL),
+        .C_MEM_WEN_OUT(C_MEM_WEN),
+	.C_MEM_CSN_OUT(C_MEM_CSN),
+		  .C_MEM_REN_OUT(C_MEM_REN)
     );
 
     WBREG id_ex_wbreg( //OK
         .RF_WE_IN(RF_WE_ID_EX_IN),
         .MREWR_MUX_IN(MREWR_MUX_ID_EX_IN),
         .NUMINSTADD_IN(NUMINSTADD_ID_EX_IN),
-	.RD_FOR_MUX_IN(RDMUX_ID_EX_IN),
+		  .RD_FOR_MUX_IN(RDMUX_ID_EX_IN),
         .CLK(CLK),
+		  .ENABLE(~CACHE_STALL),
         .RF_WE_OUT(RF_WE_EX_MEM_IN),
         .MREWR_MUX_OUT(MREWR_MUX_EX_MEM_IN),
         .NUMINSTADD_OUT(NUMINSTADD_EX_MEM_IN),
-	.RD_FOR_MUX_OUT(RDMUX_EX_MEM_IN)
+		  .RD_FOR_MUX_OUT(RDMUX_EX_MEM_IN)
     );
 
     WBREG ex_mem_wbreg( //OK
-        .RF_WE_IN(RF_WE_EX_MEM_IN),
-        .MREWR_MUX_IN(MREWR_MUX_EX_MEM_IN),
-        .NUMINSTADD_IN(NUMINSTADD_EX_MEM_IN),
-	.RD_FOR_MUX_IN(RDMUX_EX_MEM_IN),
+        .RF_WE_IN(RF_WE_EX_MEM_IN), // to 0
+        .MREWR_MUX_IN(MREWR_MUX_EX_MEM_IN), //2'b10
+        .NUMINSTADD_IN(NUMINSTADD_EX_MEM_IN), //0
+		  .RD_FOR_MUX_IN(RDMUX_EX_MEM_IN), // no need 
         .CLK(CLK),
-	.RD_FOR_MUX_OUT(RDFORMUXSIG),
+		  .ENABLE(~CACHE_STALL),
+		  .RD_FOR_MUX_OUT(RDFORMUXSIG),
         .RF_WE_OUT(RF_WE_MEM_WB_IN),
         .MREWR_MUX_OUT(MREWR_MUX_MEM_WB_IN),
         .NUMINSTADD_OUT(NUMINSTADD_MEM_WB_IN)
     );
 
-    WBREG mem_wb_wbreg( //OK
-	.RD_FOR_MUX_IN(RDMUX_MEM_WB_IN),
-        .RF_WE_IN(RF_WE_MEM_WB_IN),
-        .MREWR_MUX_IN(MREWR_MUX_MEM_WB_IN),
-        .NUMINSTADD_IN(NUMINSTADD_MEM_WB_IN),
+    LASTWBREG mem_wb_wbreg( //OK
+        .RF_WE_IN(RF_WE_MEM_WB_IN), // to 0
+        .MREWR_MUX_IN(MREWR_MUX_MEM_WB_IN), //2'b10
+        .NUMINSTADD_IN(NUMINSTADD_MEM_WB_IN), //0
         .CLK(CLK),
-	.RD_FOR_MUX_OUT(RDMUXDUMMY),
+		  .ENABLE(~CACHE_STALL),
         .RF_WE_OUT(RF_WE),
         .MREWR_MUX_OUT(MREWR_MUX_SIG),
         .NUMINSTADD_OUT(NUMINSTADD)
@@ -334,7 +294,7 @@ module RISCV_TOP (
 	
 	TRANSLATE d_translate( //OK
 		.E_ADDR(ALUOUT_D),
-		.T_ADDR(D_MEM_ADDR)
+		.T_ADDR(C_MEM_ADDR)
 	);
 
 	///MUX///////////////////////
@@ -412,7 +372,7 @@ module RISCV_TOP (
 	//IF/ID pipeline registers//
 	CONTROLREG PCr ( //ok
 		.CLK(CLK),
-		.WREN(PC_WR),
+		.WREN(PC_WR & (~CACHE_STALL)),
 		.RSTn(RSTn),
 		.IN_VAL(PC_OUT),
 		.OUT_VAL(PCr_OUT)
@@ -421,8 +381,8 @@ module RISCV_TOP (
 	INSTREG instreg ( //ok
 		.CLK(CLK),
 		.INSTRUCTION(I_MEM_DI),
-		.IRWRITE(IR_WR),
-        	.DUMMY(FLUSH),
+		.IRWRITE(IR_WR & (~CACHE_STALL)),
+      .DUMMY(FLUSH),
 		.OPCODE(OPCODE),
 		.IMMEDIATE(IMM_IN),
 		.RS1(RF_RA1),
@@ -435,100 +395,132 @@ module RISCV_TOP (
 	/////////////////////////////
 	
 
-	BIT1REG halt1reg(
+	CONTROLBIT1REG halt1reg(
 		.CLK(CLK),
+		.WREN(~CACHE_STALL),
+		.RSTn(RSTn),
 		.IN_VAL(HALT_ID_EX_IN),
 		.OUT_VAL(HALT_EX_MEM_IN)
 	);
 
-    BIT1REG users1reg(
+    CONTROLBIT1REG users1reg(
         .CLK(CLK),
+		  .WREN(~CACHE_STALL),
+		  .RSTn(RSTn),
         .IN_VAL(USE_RS1_IN),
         .OUT_VAL(USE_RS1_OUT)
     );
 
-    BIT1REG users2reg(
+    CONTROLBIT1REG users2reg(
         .CLK(CLK),
+		  .WREN(~CACHE_STALL),
+		  .RSTn(RSTn),
         .IN_VAL(USE_RS2_IN),
         .OUT_VAL(USE_RS2_OUT)
     );
 
-	REG imm ( //OK
+	CONTROLREG imm ( //OK
 		.CLK(CLK),
+		.WREN(~CACHE_STALL),
+		.RSTn(RSTn),
 		.IN_VAL(IMM_IN),
 		.OUT_VAL(IMM_OUT)
 	);
 
-	REG PCm( //OK
+	CONTROLREG PCm( //OK
 		.CLK(CLK),
+		.WREN(~CACHE_STALL),
+		.RSTn(RSTn),
 		.IN_VAL(PCr_OUT),
 		.OUT_VAL(PCm_OUT)
 	);
 
-	REG Ae( //OK
+	CONTROLREG Ae( //OK
 		.CLK(CLK),
+		.WREN(~CACHE_STALL),
+		.RSTn(RSTn),
 		.IN_VAL(FMUX1OUT),
 		.OUT_VAL(Ae_OUT)
 	);
 
-	REG Be( //OK
+	CONTROLREG Be( //OK
 		.CLK(CLK),
+		.WREN(~CACHE_STALL),
+		.RSTn(RSTn),
 		.IN_VAL(FMUX2OUT),
 		.OUT_VAL(Be_OUT)
 	);
 
-    REG id_ex_zero( //OK
+    CONTROLREG id_ex_zero( //OK
         .CLK(CLK),
+		  .WREN(~CACHE_STALL),
+		  .RSTn(RSTn),
         .IN_VAL({31'b0000000000000000000000000000000, FLUSH}),
         .OUT_VAL(ZERO_EX_MEM)
     );
 
-    BIT5REG id_ex_rs1(
+    CONTROLBIT5REG id_ex_rs1(
         .CLK(CLK),
+		  .WREN(~CACHE_STALL),
+		  .RSTn(RSTn),
         .IN_VAL(RF_RA1),
         .OUT_VAL(RS1EX)
     );
 
-    BIT5REG id_ex_rs2(
+    CONTROLBIT5REG id_ex_rs2(
         .CLK(CLK),
+		  .WREN(~CACHE_STALL),
+		  .RSTn(RSTn),
         .IN_VAL(RF_RA2),
         .OUT_VAL(RS2EX)
     );
 
-    BIT5REG id_ex_rd(
+    CONTROLBIT5REG id_ex_rd(
         .CLK(CLK),
+		  .WREN(~CACHE_STALL),
+		  .RSTn(RSTn),
         .IN_VAL(RDID),
         .OUT_VAL(RDEX)
     );
 	/////////////////////////////
 	
 	//EX/MEM pipeline registers//
-	REG aluout ( //ok
+	CONTROLREG aluout ( //ok
 		.CLK(CLK),
+		.WREN(~CACHE_STALL),
+		.RSTn(RSTn),
 		.IN_VAL(ALU_D),
 		.OUT_VAL(ALUOUT_D)
 	);
 
-	REG Bm ( //ok
+	CONTROLREG Bm ( //ok
 		.CLK(CLK),
+		.WREN(~CACHE_STALL),
+		.RSTn(RSTn),
 		.IN_VAL(Be_OUT),
-		.OUT_VAL(D_MEM_DOUT)
+		.OUT_VAL(C_MEM_DOUT)
 	);
 
-    REG ex_mem_zero( //ok
+    CONTROLREG ex_mem_zero( //ok
         .CLK(CLK),
+		  .WREN(~CACHE_STALL),
+		  .RSTn(RSTn),
         .IN_VAL(ZERO_EX_MEM),
         .OUT_VAL(ZERO_MEM_WB)
     );
 
-    BIT5REG ex_mem_rd(
+    CONTROLBIT5REG ex_mem_rd(
         .CLK(CLK),
+		  .WREN(~CACHE_STALL),
+		  .RSTn(RSTn),
         .IN_VAL(RDEX),
         .OUT_VAL(RDMEM)
     );
 
-	BIT1REG halt2reg(
+	CONTROLBIT1REG halt2reg(
 		.CLK(CLK),
+		.WREN(~CACHE_STALL),
+		.RSTn(RSTn),
 		.IN_VAL(HALT_EX_MEM_IN),
 		.OUT_VAL(HALT_MEM_WB_IN)
 	);
@@ -537,7 +529,7 @@ module RISCV_TOP (
 	//MEM_WB pipeline registers//
 	REG MDRw ( //OK
 		.CLK(CLK),
-		.IN_VAL(D_MEM_DI),
+		.IN_VAL(C_MEM_DI),
 		.OUT_VAL(MDRw_OUT)
 	);
 

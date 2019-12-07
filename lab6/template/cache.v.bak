@@ -210,7 +210,6 @@ module CACHE (
 			3'b011: _CACHE_DATA[_CUR_INDEX][95:64] = D_MEM_DI;
 			3'b100: _CACHE_DATA[_CUR_INDEX][63:32] = D_MEM_DI;
 			3'b101: _CACHE_DATA[_CUR_INDEX][31:0] = D_MEM_DI;
-			endcase
 		end	
 		end
 	end

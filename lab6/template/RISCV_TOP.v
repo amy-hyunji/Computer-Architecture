@@ -43,19 +43,19 @@ module RISCV_TOP (
     wire RF_WE_ID_EX_IN, RF_WE_EX_MEM_IN, RF_WE_MEM_WB_IN;
     wire RDMUX_ID_EX_IN, RDMUX_EX_MEM_IN, RDFORMUXSIG;
     wire [1:0] MREWR_MUX_ID_EX_IN, MREWR_MUX_EX_MEM_IN, MREWR_MUX_MEM_WB_IN, MREWR_MUX_SIG;
+    wire C_MEM_WEN_ID_EX_IN, C_MEM_WEN_EX_MEM_IN;
     wire [4:0] RS1EX, RS2EX, RDID, RDEX, RDMEM, RDWB;
     wire [1:0] FORWARDMUX1, FORWARDMUX2;
+    wire D_MEM_CSN_ID_EX_IN, D_MEM_CSN_EX_MEM_IN;
     wire NUMINSTADD, NUMINSTADD_ID_EX_IN, NUMINSTADD_EX_MEM_IN, NUMINSTADD_MEM_WB_IN, PCMUX, USE_RS1_IN, USE_RS2_IN, USE_RS1_OUT, USE_RS2_OUT;
     wire HALT_ID_EX_IN, HALT_EX_MEM_IN, HALT_MEM_WB_IN;
-
+	
 	 //FOR CACHE//
 	 wire [31:0] C_MEM_DI, C_MEM_DOUT;
 	 wire C_MEM_WEN, C_MEM_REN, CACHE_STALL;
 	 wire [11:0] C_MEM_ADDR;
 	 wire C_MEM_REN_ID_EX_IN, C_MEM_REN_EX_MEM_IN;
-    wire C_MEM_WEN_ID_EX_IN, C_MEM_WEN_EX_MEM_IN;
-	 wire C_MEM_CSN_ID_EX_IN, C_MEM_CSN_EX_MEM_IN, C_MEM_CSN;
- 
+ 	 wire C_MEM_CSN_ID_EX_IN, C_MEM_CSN_EX_MEM_IN, C_MEM_CSN;
     reg [31:0] cnt;
     assign RF_WA1 = RDWB;
 	 assign OUTPUT_PORT = RF_WD;
@@ -64,9 +64,26 @@ module RISCV_TOP (
 		NUM_INST <= 0;
 	 end
 
+	/*
 	 always@ (posedge CLK) begin
+		_CACHE_VALID[_CUR_INDEX] = 1;cnt = cnt+1;
+		$display("------------");
+		$display("cnt : %d",cnt);
+		$display("opcode: %b", OPCODE);
+		$display("cmemcsn %b",C_MEM_CSN);
+		$display("dmemcsn %b",D_MEM_CSN);
+		$display("RSTN: %b", RSTn);
+		$display("output port: %h", OUTPUT_PORT);
+		$display("cache stall: %b", CACHE_STALL);
+		$display("CMEMDI %b", C_MEM_DI);
+		$display("C MEM WEN at id %b", C_MEM_WEN_ID_EX_IN);
+		$display("C MEM REN at id %b", C_MEM_REN_ID_EX_IN);
+		$display("C MEM WEN at mem %b", C_MEM_WEN);
+		$display("C MEM REN at mem %b", C_MEM_REN);
+		$display("D MEM WEN %b", D_MEM_WEN);
 		$display("numinst is %d", NUM_INST);
 	 end
+	*/
 
 	 	// Only allow for NUM_INST
 	always @ (negedge CLK) begin
@@ -95,8 +112,8 @@ module RISCV_TOP (
 		.RF_WE(RF_WE_ID_EX_IN),
 		.C_MEM_WEN(C_MEM_WEN_ID_EX_IN),
 		.C_MEM_REN(C_MEM_REN_ID_EX_IN),
-		.I_MEM_CSN(I_MEM_CSN),
 		.C_MEM_CSN(C_MEM_CSN_ID_EX_IN),
+		.I_MEM_CSN(I_MEM_CSN),
 		.REWR_MUX(MREWR_MUX_ID_EX_IN),
 		.AMUX(AMUX_EX_IN),
 		.ISJALR(ISJALR),
@@ -203,24 +220,24 @@ module RISCV_TOP (
 
     MEMREG id_ex_memreg ( //OK
         .C_MEM_WEN_IN(C_MEM_WEN_ID_EX_IN),
+	.C_MEM_CSN_IN(C_MEM_CSN_ID_EX_IN),
 		  .C_MEM_REN_IN(C_MEM_REN_ID_EX_IN),
-		  .C_MEM_CSN_IN(C_MEM_CSN_ID_EX_IN),
         .CLK(CLK),
 		  .ENABLE(~CACHE_STALL),
-		  .C_MEM_CSN_OUT(C_MEM_CSN_EX_MEM_IN),
         .C_MEM_WEN_OUT(C_MEM_WEN_EX_MEM_IN),
-		  .C_MEM_REN_OUT(C_MEM_REN_EX_MEM_IN),
+	.C_MEM_CSN_OUT(C_MEM_CSN_EX_MEM_IN),
+		  .C_MEM_REN_OUT(C_MEM_REN_EX_MEM_IN)
     );
 
     MEMREG ex_mem_memreg ( //ok
         .C_MEM_WEN_IN(C_MEM_WEN_EX_MEM_IN),
+	.C_MEM_CSN_IN(C_MEM_CSN_EX_MEM_IN),
 		  .C_MEM_REN_IN(C_MEM_REN_EX_MEM_IN),
-		  .C_MEM_CSN_IN(C_MEM_CSN_EX_MEM_IN),
         .CLK(CLK),
 		  .ENABLE(~CACHE_STALL),
         .C_MEM_WEN_OUT(C_MEM_WEN),
-		  .C_MEM_CSN_OUT(C_MEM_CSN),
-		  .C_MEM_REN_OUT(C_MEM_REN),
+	.C_MEM_CSN_OUT(C_MEM_CSN),
+		  .C_MEM_REN_OUT(C_MEM_REN)
     );
 
     WBREG id_ex_wbreg( //OK
