@@ -43,8 +43,7 @@ module RISCV_TOP (
     wire RF_WE_ID_EX_IN, RF_WE_EX_MEM_IN, RF_WE_MEM_WB_IN;
     wire RDMUX_ID_EX_IN, RDMUX_EX_MEM_IN, RDFORMUXSIG;
     wire [1:0] MREWR_MUX_ID_EX_IN, MREWR_MUX_EX_MEM_IN, MREWR_MUX_MEM_WB_IN, MREWR_MUX_SIG;
-    wire D_MEM_WEN_ID_EX_IN, D_MEM_WEN_EX_MEM_IN;
-    wire [3:0] D_MEM_BE_ID_EX_IN, D_MEM_BE_EX_MEM_IN;
+    wire C_MEM_WEN_ID_EX_IN, C_MEM_WEN_EX_MEM_IN;
     wire [4:0] RS1EX, RS2EX, RDID, RDEX, RDMEM, RDWB;
     wire [1:0] FORWARDMUX1, FORWARDMUX2;
     wire D_MEM_CSN_ID_EX_IN, D_MEM_CSN_EX_MEM_IN;
@@ -93,11 +92,9 @@ module RISCV_TOP (
 		.PREV_DEST(RDEX), //previous instruction WD
 		.PREV_REWR_MUX(MREWR_MUX_EX_MEM_IN),
       .ZERO(ZERO),
-		.D_MEM_BE(D_MEM_BE_ID_EX_IN),
 		.RF_WE(RF_WE_ID_EX_IN),
-		.D_MEM_WEN(D_MEM_WEN_ID_EX_IN),
+		.C_MEM_WEN(C_MEM_WEN_ID_EX_IN),
 		.C_MEM_REN(C_MEM_WEN_ID_EX_IN),
-		.D_MEM_CSN(D_MEM_CSN_ID_EX_IN),
 		.I_MEM_CSN(I_MEM_CSN),
 		.REWR_MUX(MREWR_MUX_ID_EX_IN),
 		.AMUX(AMUX_EX_IN),
@@ -204,29 +201,21 @@ module RISCV_TOP (
     );
 
     MEMREG id_ex_memreg ( //OK
-        .D_MEM_WEN_IN(D_MEM_WEN_ID_EX_IN),
+        .C_MEM_WEN_IN(C_MEM_WEN_ID_EX_IN),
 		  .C_MEM_REN_IN(C_MEM_WEN_ID_EX_IN),
-        .D_MEM_BE_IN(D_MEM_BE_ID_EX_IN),
-        .D_MEM_CSN_IN(D_MEM_CSN_ID_EX_IN),
         .CLK(CLK),
 		  .ENABLE(~CACHE_STALL),
-        .D_MEM_WEN_OUT(D_MEM_WEN_EX_MEM_IN),
+        .C_MEM_WEN_OUT(C_MEM_WEN_EX_MEM_IN),
 		  .C_MEM_REN_OUT(C_MEM_WEN_EX_MEM_IN),
-        .D_MEM_BE_OUT(D_MEM_BE_EX_MEM_IN),
-        .D_MEM_CSN_OUT(D_MEM_CSN_EX_MEM_IN)
     );
 
     MEMREG ex_mem_memreg ( //ok
-        .D_MEM_WEN_IN(D_MEM_WEN_EX_MEM_IN),
+        .C_MEM_WEN_IN(C_MEM_WEN_EX_MEM_IN),
 		  .C_MEM_REN_IN(C_MEM_WEN_EX_MEM_IN),
-        .D_MEM_BE_IN(D_MEM_BE_EX_MEM_IN),
-        .D_MEM_CSN_IN(D_MEM_CSN_EX_MEM_IN),
         .CLK(CLK),
 		  .ENABLE(~CACHE_STALL),
-        .D_MEM_WEN_OUT(C_MEM_WEN),
+        .C_MEM_WEN_OUT(C_MEM_WEN),
 		  .C_MEM_REN_OUT(C_MEM_REN),
-        .D_MEM_BE_OUT(D_MEM_BE),
-        .D_MEM_CSN_OUT(D_MEM_CSN)
     );
 
     WBREG id_ex_wbreg( //OK

@@ -34,6 +34,7 @@ module CACHE (
 	reg _WRITE_MISS;
 	reg _WRITE_HIT;
 	reg [31:0]_C_MEM_DOUT;
+	reg _C_MEM_WEN, _C_MEM_REN;
 
 	assign CACHE_STALL = _CACHE_STALL;
 	assign D_MEM_ADDR = _D_MEM_ADDR;
@@ -57,6 +58,8 @@ module CACHE (
 		_D_MEM_DOUT <= 0;
 		_D_MEM_WEN <= 1;
 		_WRITE_HIT <= 0;
+		_C_MEM_WEN <= 1;
+		_C_MEM_REN <= 1;
 
 		for(idx=0; idx<8; idx=idx+1) begin
 			_CACHE_TAG[idx] <= 0;
@@ -72,7 +75,7 @@ module CACHE (
 		_CUR_INDEX = C_MEM_ADDR[6:4];
 		_CUR_BO = C_MEM_ADDR[3:2];
 
-		if (C_MEM_REN == 0) begin
+		if (_C_MEM_REN == 0) begin
 			//check if hit
 			if ((_CUR_TAG == _CACHE_TAG[_CUR_INDEX]) & (_CACHE_VALID[_CUR_INDEX] == 1)) begin
 				case (_CUR_BO)
@@ -92,7 +95,7 @@ module CACHE (
 			end
 		end
 	
-		if (C_MEM_WEN == 0) begin
+		if (_C_MEM_WEN == 0) begin
 			if ((_CUR_TAG == _CACHE_TAG[_CUR_INDEX]) & (_CACHE_VALID[_CUR_INDEX] == 1)) begin
 				// write hit -> write through
 				_WRITE_HIT = 1;
@@ -189,6 +192,9 @@ module CACHE (
 	end
 
 	always@ (posedge CLK) begin
+		_C_MEM_REN = C_MEM_REN;
+		_C_MEM_WEN = C_MEM_WEN;
+		
 		if (_WRITE_HIT == 1) begin
 			_WRITE_HIT = 0;
 			_D_MEM_WEN = 1;
@@ -210,6 +216,7 @@ module CACHE (
 					_CACHE_DATA[_CUR_INDEX][31:0] = D_MEM_DI;
 					_CACHE_VALID[_CUR_INDEX] = 1;
 					_CACHE_TAG[_CUR_INDEX] = _CUR_TAG;
+					_C_MEM_REN = 1;
 					case (_CUR_BO)
 					2'b00: 
 						_C_MEM_DOUT = _CACHE_DATA[_CUR_INDEX][127:96];
@@ -239,6 +246,7 @@ module CACHE (
 					_CACHE_DATA[_CUR_INDEX][31:0] = D_MEM_DI;
 					_CACHE_VALID[_CUR_INDEX] = 1;
 					_CACHE_TAG[_CUR_INDEX] = _CUR_TAG;
+					_C_MEM_WEN = 1;
 					case (_CUR_BO)
 					2'b00:
 						_C_MEM_DOUT = _CACHE_DATA[_CUR_INDEX][127:96];
