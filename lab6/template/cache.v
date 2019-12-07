@@ -1,9 +1,9 @@
 module CACHE (
 
 	input wire CLK,
-	input wire RSTn, 
 	input wire [31:0] C_MEM_DI,
 	input wire C_MEM_WEN,
+	input wire CSN,
 	input wire C_MEM_REN, 
 	input wire [11:0] C_MEM_ADDR,
 	input wire [31:0] D_MEM_DI,
@@ -38,7 +38,7 @@ module CACHE (
 
 	assign CACHE_STALL = _CACHE_STALL;
 	assign D_MEM_ADDR = _D_MEM_ADDR;
-	assign D_MEM_CSN = ~RSTn;
+	assign D_MEM_CSN = CSN;
 	assign D_MEM_BE = 4'b1111;
 	assign C_MEM_DOUT = _C_MEM_DOUT;
 	assign D_MEM_DOUT = _D_MEM_DOUT;
@@ -71,6 +71,7 @@ module CACHE (
 
 	always@ (*) begin
 		//Asynchronous read
+		if (~CSN) begin
 		_CUR_TAG = C_MEM_ADDR[11:7];
 		_CUR_INDEX = C_MEM_ADDR[6:4];
 		_CUR_BO = C_MEM_ADDR[3:2];
@@ -100,6 +101,8 @@ module CACHE (
 				// write hit -> write through
 				_WRITE_HIT = 1;
 				_D_MEM_WEN = 0;
+				_D_MEM_DOUT = C_MEM_DI;
+				_D_MEM_ADDR = C_MEM_ADDR;
 
 				case (_CUR_BO)
 					2'b00:
@@ -116,10 +119,12 @@ module CACHE (
 				_WRITE_MISS = 1;
 			end
 		end
+		end
 	end
 
 	always@ (negedge CLK) begin
 		//Synchronous Write
+		if (~CSN) begin
 		if(_READ_MISS == 1) begin
 			case (_READ_STATE) 
 				3'b000: begin
@@ -189,15 +194,18 @@ module CACHE (
 				end
 			endcase
 		end
+		end
 	end
 
 	always@ (posedge CLK) begin
+		if (~CSN) begin
 		_C_MEM_REN = C_MEM_REN;
 		_C_MEM_WEN = C_MEM_WEN;
 		
 		if (_WRITE_HIT == 1) begin
 			_WRITE_HIT = 0;
 			_D_MEM_WEN = 1;
+
 		end
 
 		if (_READ_STATE != 3'b000) begin
@@ -259,6 +267,7 @@ module CACHE (
 					endcase
 				end
 			endcase
+		end
 		end
 
 	end

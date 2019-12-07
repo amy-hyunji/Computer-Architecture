@@ -9,7 +9,7 @@ module CONTROL (
 	input wire [1:0] PREV_REWR_MUX,
     input wire ZERO,
 
-	output wire RF_WE, C_MEM_REN, C_MEM_WEN, I_MEM_CSN, AMUX, ISJALR, CONDMUX, 
+	output wire RF_WE, C_MEM_REN, C_MEM_WEN, I_MEM_CSN, C_MEM_CSN, AMUX, ISJALR, CONDMUX, 
 	output wire [6:0] ALU_CONTROL,
 	output wire [1:0] BMUX, REWR_MUX,
 	output wire IR_WR, PC_WR, FLUSH, NUMINSTADD, PCMUX,
@@ -32,6 +32,7 @@ module CONTROL (
 	assign ISJALR = _IS_JALR;
 	assign CONDMUX = _CONDMUX;
 	assign I_MEM_CSN = ~RSTn;
+	assign C_MEM_CSN = ~RSTn;
    assign FLUSH = _FLUSH;
    assign NUMINSTADD = _NUMINSTADD;
    assign PCMUX = _PCMUX;
@@ -43,7 +44,7 @@ module CONTROL (
 	initial begin
 		_ALU_CONTROL <=0;
 		_RE_WE <= 0;
-		_C_MEM_WEN <=0;
+		_C_MEM_WEN <=1;
 		_REWR_MUX <= 0;
 		_AMUX <= 0;
 		_BMUX <= 0;
@@ -54,7 +55,7 @@ module CONTROL (
       _PCMUX <= 0;
       _USE_RS1_IN <= 0;
       _USE_RS2_IN <= 0;
-		_C_MEM_REN <= 0;
+		_C_MEM_REN <= 1;
 	end
 
 
@@ -83,6 +84,7 @@ module CONTROL (
 				 _ALU_CONTROL = OPCODE;
 				 _RE_WE = 0;
 				 _C_MEM_WEN = 1;
+				 _C_MEM_REN = 1;
 				 _IS_JALR = 0;
 				 _FLUSH = 0;
 				 _NUMINSTADD = 0;
@@ -112,6 +114,7 @@ module CONTROL (
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
                 _C_MEM_WEN = 1;
+					 _C_MEM_REN = 1;
                 _IS_JALR = 0;
                 _FLUSH = 0;
                 _NUMINSTADD = 0;
@@ -141,6 +144,7 @@ module CONTROL (
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
                 _C_MEM_WEN = 1;
+					 _C_MEM_REN = 1;
                 _IS_JALR = 0;
                 _FLUSH = 0;
                 _NUMINSTADD = 0;
@@ -170,6 +174,7 @@ module CONTROL (
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
                 _C_MEM_WEN = 1;
+					 _C_MEM_REN = 1;
                 _IS_JALR = 0;
                 _FLUSH = 0;
                 _NUMINSTADD = 0;
@@ -200,6 +205,7 @@ module CONTROL (
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
                 _C_MEM_WEN = 1;
+					 _C_MEM_REN = 1;
                 _IS_JALR = 0;
                 _FLUSH = 0;
                 _NUMINSTADD = 0;
@@ -251,6 +257,7 @@ module CONTROL (
                 _ALU_CONTROL = OPCODE;
                 _RE_WE = 0;
                 _C_MEM_WEN = 1;
+					 _C_MEM_REN = 1;
                 _IS_JALR = 0;
                 _FLUSH = 0;
                 _NUMINSTADD = 0;
